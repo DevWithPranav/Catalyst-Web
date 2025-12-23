@@ -8,6 +8,7 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      /* ---------------- COLORS (unchanged) ---------------- */
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -44,10 +45,18 @@ const config: Config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
       },
+
+      /* ---------------- BORDER RADIUS (unchanged) ---------------- */
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+
+      /* ---------------- FONTS (NEW) ---------------- */
+      fontFamily: {
+        primary: ["var(--font-primary)", "sans-serif"], // Monument Extended
+        secondary: ["var(--font-secondary)", "sans-serif"], // Poppins
       },
     },
   },

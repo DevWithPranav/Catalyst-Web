@@ -3,17 +3,37 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { NavbarDemo } from "@/components/ui/navbar";
 import { ThemeProvider } from "next-themes";
+import { StickyBanner } from "@/components/ui/sticky-banner";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+/* PRIMARY FONT — Monument Extended */
+const monument = localFont({
+  src: [
+    {
+      path: "./fonts/MonumentExtended-Regular.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-primary",
+  display: "swap",
 });
 
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+/* SECONDARY FONT — Poppins */
+const poppins = localFont({
+  src: [
+    {
+      path: "./fonts/Poppins-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Poppins-Medium.ttf",
+      weight: "600",
+      style: "normal",
+    },
+  ],
+  variable: "--font-secondary",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -27,12 +47,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${monument.variable} ${poppins.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NavbarDemo />
+
+          <div className="relative z-30">
+            <StickyBanner className="bg-white">
+              <p className="mx-auto max-w-[99%] text-center  text-black drop-shadow-md">
+                <span className="font-secondary font-bold">Relevent 2025</span>{" "}
+                – Register Now – Gateway to Leadership and Innovation!
+              </p>
+            </StickyBanner>
+          </div>
+
           {children}
         </ThemeProvider>
       </body>

@@ -9,6 +9,10 @@
 }
 body {
   background-color: black;
+  font-family: var(--font-secondary), system-ui, sans-serif;
+}
+h1 {
+  font-family: var(--font-primary), system-ui, sans-serif;
 }
 
 @layer base {
