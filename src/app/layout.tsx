@@ -51,8 +51,7 @@ export default function RootLayout({
       <body className={`${monument.variable} ${poppins.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <NavbarDemo />
-
-          <div className="relative z-30">
+          <div className="relative ">
             <StickyBanner className="bg-white">
               <p className="mx-auto max-w-[99%] text-center  text-black drop-shadow-md">
                 <span className="font-secondary font-bold">Relevent 2025</span>{" "}
