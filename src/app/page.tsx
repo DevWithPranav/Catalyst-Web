@@ -52,6 +52,7 @@ const page = () => {
         </h2>
         <Card />
       </section>
+      
     </div>
   );
 };
