@@ -237,7 +237,7 @@ export const NavbarLogo = () => {
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-primary text-black"
     >
       <img
-        src="/Catalyst_Logo_Navbar.svg"
+        src="/Catalyst_Logo_Navbar.png"
         alt="logo"
         width={140}
         height={140}
