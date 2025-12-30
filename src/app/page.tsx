@@ -9,7 +9,7 @@ const page = () => {
           <img src="/hero_logo.png" alt="" className="w-45 h-40" />
           <h1 className="text-3xl font-bold font-primary">
             CATALYST
-            <br /> MAR BASELIOS IEDC
+            <br /> MAR BASELIOS IEDCs
           </h1>
         </div>
       </section>
@@ -52,7 +52,6 @@ const page = () => {
         </h2>
         <Card />
       </section>
-      
     </div>
   );
 };
