@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import LogoContainer from "./LogoContainer";
+import LogoContainer from "@/components/LogoContainer";
 import { Environment, OrbitControls } from "@react-three/drei";
 import { DM_Sans, Darker_Grotesque } from "next/font/google";
 import { useWindowSize } from "@/app/hooks/useWindowSize";

@@ -84,16 +84,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${monument.variable} ${poppins.variable}`}>
-        <div className="relative min-h-screen bg-background overflow-hidden">
-          {/* SVG background layer */}
+        <div className="relative min-h-screen bg-background">
           <div
-            className="absolute inset-0 bg-center bg-repeat bg-cover opacity-5 pointer-events-none"
+            className="absolute inset-0 opacity-5 pointer-events-none"
             style={{
               backgroundImage: "url('/images/Logo.svg')",
+              backgroundRepeat: "repeat-y",
+              backgroundSize: "1200px 1200px 1200px",
+              backgroundPosition: "center top center",
             }}
           />
 
-          {/* Content */}
           <div className="relative z-10">
             <Navbar />
             <MobileMenu />
