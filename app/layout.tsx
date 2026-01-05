@@ -1,21 +1,79 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import MobileMenu from "@/components/MobileMenu";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const monument = localFont({
+  src: [
+    {
+      path: "../public/fonts/MonumentExtended-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/MonumentExtended-Ultrabold.otf",
+      weight: "800",
+      style: "normal",
+    },
+  ],
+  variable: "--font-monument",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const poppins = localFont({
+  src: [
+    {
+      path: "../public/fonts/Poppins-Thin.ttf",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-ExtraLight.ttf",
+      weight: "200",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-ExtraBold.ttf",
+      weight: "800",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/Poppins-Black.ttf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
-  title: "Catalyst Mar Baselios IEDC",
-  description: "",
+  title: "Your Site Title",
+  description: "Your site description",
 };
 
 export default function RootLayout({
@@ -25,10 +83,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${monument.variable} ${poppins.variable}`}>
+        <div className="relative min-h-screen bg-background">
+          <div
+            className="absolute inset-0 opacity-5 pointer-events-none"
+            style={{
+              backgroundImage: "url('/images/Logo.svg')",
+              backgroundRepeat: "repeat-y",
+              backgroundSize: "1200px 1200px 1200px",
+              backgroundPosition: "center top center",
+            }}
+          />
+
+          <div className="relative z-10">
+            <Navbar />
+            <MobileMenu />
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );
