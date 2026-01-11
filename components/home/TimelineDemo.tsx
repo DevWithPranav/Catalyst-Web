@@ -70,7 +70,7 @@ export default function TimelineDemo() {
 
   return (
     <div className="relative w-full overflow-clip ">
-      <h2 className="text-3xl font-primary mb-3 text-center text-white mx-5 mt-35">
+      <h2 className="text-3xl font-primary mb-3 text-center text-white mx-5 mt-50">
         TIMELINE
       </h2>
 

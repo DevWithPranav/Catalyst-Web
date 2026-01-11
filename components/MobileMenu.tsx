@@ -9,7 +9,7 @@ const MobileMenu = () => {
     { page: "Home", path: "/" },
     { page: "Events", path: "/events" },
     { page: "Team", path: "/team" },
-    { page: "Innovate", path: "/innovate" },
+    { page: "Execom", path: "/execom" },
     { page: "MuLearn", path: "/mulearn" },
     { page: "About", path: "/about" },
   ];

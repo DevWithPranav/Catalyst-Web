@@ -20,8 +20,8 @@ const Navbar = () => {
       path: "/team",
     },
     {
-      page: "Innovate",
-      path: "/innovate",
+      page: "Execom",
+      path: "/execom",
     },
     {
       page: "MuLearn",

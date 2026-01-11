@@ -3,7 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import MobileMenu from "@/components/MobileMenu";
-
+import Footer from "@/components/Footer";
+import { StickyBanner } from "@/components/ui/sticky-banner";
 const monument = localFont({
   src: [
     {
@@ -86,7 +87,7 @@ export default function RootLayout({
       <body className={`${monument.variable} ${poppins.variable}`}>
         <div className="relative min-h-screen bg-background">
           <div
-            className="absolute inset-0 opacity-5 pointer-events-none"
+            className="absolute inset-0 opacity-7 pointer-events-none"
             style={{
               backgroundImage: "url('/images/Logo.svg')",
               backgroundRepeat: "repeat-y",
@@ -97,8 +98,15 @@ export default function RootLayout({
 
           <div className="relative z-10">
             <Navbar />
+            <StickyBanner>
+              Relevent 2025 - Register Now- Gateway to Leadership and Innovation
+            </StickyBanner>
+
             <MobileMenu />
+
             {children}
+
+            <Footer />
           </div>
         </div>
       </body>
