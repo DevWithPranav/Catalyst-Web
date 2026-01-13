@@ -33,12 +33,14 @@ const a = [1, 2];
 const Execom = () => {
   return (
     <div>
-      <div className="flex items-center justify-center  h-[60vh] text-white">
+      <div className="flex items-center justify-center  h-[50vh] text-white">
         <h1 className="text-3xl font-primary text-center text-white">
           THE CATALYST FAMILY
         </h1>
       </div>
-      <Card />
+      <div className="mt-[-40]">
+        <Card />
+      </div>
 
       <div className="bg-white pt-10 mt-30 mx-5">
         <h2 className="font-primary text-xl mt-5 text-black text-center mb-10">
