@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { Query } from "node-appwrite";
-import { database } from "@/lib/appwrite/server";
+import { database, storage } from "@/lib/appwrite/server";
 import { ID } from "node-appwrite";
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ member_id: string }> }
@@ -23,19 +24,19 @@ export async function GET(
 
       database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "user_link_roles",
+        process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
         [Query.equal("user_id", member_id)]
       ),
 
       database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "user_link_social",
+        process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_SOCIAL_COLLECTION_ID!,
         [Query.equal("user_id", member_id)]
       ),
 
       database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "user_link_org",
+        process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
         [Query.equal("user_id", member_id)]
       ),
     ]);
@@ -49,7 +50,7 @@ export async function GET(
     if (roleIds.length > 0) {
       const rolesData = await database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "role",
+        process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
         [Query.equal("$id", roleIds)]
       );
       finalRoleNames = rolesData.documents.map((r: any) => r.name);
@@ -72,7 +73,7 @@ export async function GET(
     if (orgIds.length > 0) {
       const orgsData = await database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "organization",
+        process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
         [Query.equal("$id", orgIds)]
       );
 
@@ -132,9 +133,81 @@ export async function PATCH(
 ) {
   try {
     const { member_id } = await params;
-    const body = await request.json();
+    const formData = await request.formData();
 
-    const { roles, orgs, socials, ...memberDetails } = body;
+    const rolesRaw = formData.get("roles") as string;
+    const orgsRaw = formData.get("orgs") as string;
+    const socialsRaw = formData.get("socials") as string;
+    const photoFile = formData.get("photo");
+
+    const roles = rolesRaw ? JSON.parse(rolesRaw) : null;
+    const orgs = orgsRaw ? JSON.parse(orgsRaw) : null;
+    const socials = socialsRaw ? JSON.parse(socialsRaw) : null;
+
+    const memberDetails: any = {};
+    const specialKeys = ["roles", "orgs", "socials", "photo"];
+
+    formData.forEach((value, key) => {
+      if (!specialKeys.includes(key) && typeof value === "string") {
+        memberDetails[key] = value;
+      }
+    });
+
+    if (photoFile) {
+      if (photoFile instanceof File && photoFile.size > 0) {
+        console.log("Processing new photo upload...");
+
+        try {
+          const currentMember = await database.getDocument(
+            process.env.NEXT_APPWRITE_DATABASE_ID!,
+            process.env.NEXT_PUBLIC_APPWRITE_MEMBER_COLLECTION_ID!,
+            member_id
+          );
+
+          if (currentMember.photo) {
+            const fileIdMatch =
+              currentMember.photo.match(/files\/([^/]+)\/view/);
+
+            if (fileIdMatch && fileIdMatch[1]) {
+              const oldFileId = fileIdMatch[1];
+              console.log("Deleting old photo:", oldFileId);
+
+              try {
+                await storage.deleteFile(
+                  process.env.NEXT_APPWRITE_BUCKET_ID!,
+                  oldFileId
+                );
+              } catch (deleteErr) {
+                console.warn(
+                  "Could not delete old file (might not exist):",
+                  deleteErr
+                );
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error checking old photo:", err);
+        }
+
+        console.log("Uploading new file:", photoFile.name);
+        const uploadedFile = await storage.createFile(
+          process.env.NEXT_APPWRITE_BUCKET_ID!,
+          ID.unique(),
+          photoFile
+        );
+
+        const projectId = process.env.NEXT_APPWRITE_PROJECT_ID;
+        const endpoint = process.env.NEXT_APPWRITE_ENDPOINT;
+
+        memberDetails.photo = `${endpoint}/storage/buckets/${process.env.NEXT_APPWRITE_BUCKET_ID}/files/${uploadedFile.$id}/view?project=${projectId}&mode=admin`;
+      } else if (typeof photoFile === "string") {
+        if (photoFile.startsWith("http")) {
+          memberDetails.photo = photoFile;
+        } else if (photoFile === "null" || photoFile === "") {
+          memberDetails.photo = null;
+        }
+      }
+    }
 
     if (Object.keys(memberDetails).length > 0) {
       await database.updateDocument(
@@ -148,114 +221,100 @@ export async function PATCH(
     if (roles && Array.isArray(roles)) {
       const currentRoleLinks = await database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "user_link_roles",
+        process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
         [Query.equal("user_id", member_id)]
       );
-
       const linksToDelete = currentRoleLinks.documents.filter(
         (doc: any) => !roles.includes(doc.role_id.$id || doc.role_id)
       );
-
       const currentRoleIds = currentRoleLinks.documents.map(
         (doc: any) => doc.role_id.$id || doc.role_id
       );
       const rolesToAdd = roles.filter(
         (id: string) => !currentRoleIds.includes(id)
       );
-
-      await Promise.all(
-        linksToDelete.map((doc) =>
+      await Promise.all([
+        ...linksToDelete.map((doc) =>
           database.deleteDocument(
             process.env.NEXT_APPWRITE_DATABASE_ID!,
-            "user_link_roles",
+            process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
             doc.$id
           )
-        )
-      );
-
-      await Promise.all(
-        rolesToAdd.map((role_id) =>
+        ),
+        ...rolesToAdd.map((role_id) =>
           database.createDocument(
             process.env.NEXT_APPWRITE_DATABASE_ID!,
-            "user_link_roles",
+            process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
             ID.unique(),
             { user_id: member_id, role_id: role_id }
           )
-        )
-      );
+        ),
+      ]);
     }
 
     if (orgs && Array.isArray(orgs)) {
       const currentOrgLinks = await database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "user_link_org",
+        process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
         [Query.equal("user_id", member_id)]
       );
-
       const linksToDelete = currentOrgLinks.documents.filter(
         (doc: any) => !orgs.includes(doc.org_id.$id || doc.org_id)
       );
-
       const currentOrgIds = currentOrgLinks.documents.map(
         (doc: any) => doc.org_id.$id || doc.org_id
       );
       const orgsToAdd = orgs.filter(
         (id: string) => !currentOrgIds.includes(id)
       );
-
-      await Promise.all(
-        linksToDelete.map((doc) =>
+      await Promise.all([
+        ...linksToDelete.map((doc) =>
           database.deleteDocument(
             process.env.NEXT_APPWRITE_DATABASE_ID!,
-            "user_link_org",
+            process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
             doc.$id
           )
-        )
-      );
-
-      await Promise.all(
-        orgsToAdd.map((org_id) =>
+        ),
+        ...orgsToAdd.map((org_id) =>
           database.createDocument(
             process.env.NEXT_APPWRITE_DATABASE_ID!,
-            "user_link_org",
+            process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
             ID.unique(),
             { user_id: member_id, org_id: org_id }
           )
-        )
-      );
+        ),
+      ]);
     }
 
     if (socials) {
       const existingSocials = await database.listDocuments(
         process.env.NEXT_APPWRITE_DATABASE_ID!,
-        "user_link_social",
+        process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_SOCIAL_COLLECTION_ID!,
         [Query.equal("user_id", member_id)]
       );
-
       if (existingSocials.total > 0) {
-        const socialDocId = existingSocials.documents[0].$id;
         await database.updateDocument(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
-          "user_link_social",
-          socialDocId,
+          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_SOCIAL_COLLECTION_ID!,
+          existingSocials.documents[0].$id,
           socials
         );
       } else {
         await database.createDocument(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
-          "user_link_social",
+          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_SOCIAL_COLLECTION_ID!,
           ID.unique(),
-          {
-            user_id: member_id,
-            ...socials,
-          }
+          { user_id: member_id, ...socials }
         );
       }
     }
 
     return NextResponse.json({
       message: "Member updated successfully",
-      updated_fields: Object.keys(body),
+      updated_fields: [
+        ...Object.keys(memberDetails),
+        ...specialKeys.filter((k) => formData.has(k)),
+      ],
     });
   } catch (error: any) {
     console.error("PATCH Error:", error);
