@@ -10,7 +10,7 @@ export async function GET(
 
     const role = await database.getDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "role",
+      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
       role_id
     );
 
@@ -40,7 +40,7 @@ export async function PATCH(
 
     const updatedRole = await database.updateDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "role",
+      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
       role_id,
       body
     );
@@ -63,7 +63,7 @@ export async function DELETE(
 
     await database.deleteDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "role",
+      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
       role_id
     );
 

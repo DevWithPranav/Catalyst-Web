@@ -11,7 +11,7 @@ export async function GET(
 
     const links = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "user_link_roles",
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
       [Query.equal("user_id", member_id)]
     );
 
@@ -25,7 +25,7 @@ export async function GET(
 
     const roles = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "role",
+      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
       [Query.equal("$id", roleIds)]
     );
 
@@ -56,7 +56,7 @@ export async function POST(
 
     const currentLinks = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "user_link_roles",
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
       [Query.equal("user_id", member_id)]
     );
 
@@ -74,7 +74,7 @@ export async function POST(
       rolesToAdd.map((role_id) =>
         database.createDocument(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
-          "user_link_roles",
+          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
           ID.unique(),
           {
             user_id: member_id,

@@ -11,7 +11,7 @@ export async function DELETE(
 
     const targetLink = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "user_link_roles",
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
       [Query.equal("user_id", member_id), Query.equal("role_id", role_id)]
     );
 
@@ -24,7 +24,7 @@ export async function DELETE(
 
     await database.deleteDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "user_link_roles",
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
       targetLink.documents[0].$id
     );
 
@@ -58,7 +58,7 @@ export async function PATCH(
 
     const targetLink = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "user_link_roles",
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
       [Query.equal("user_id", member_id), Query.equal("role_id", role_id)]
     );
 
@@ -73,7 +73,7 @@ export async function PATCH(
 
     await database.updateDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "user_link_roles",
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
       linkDocId,
       {
         role_id: new_role_id,

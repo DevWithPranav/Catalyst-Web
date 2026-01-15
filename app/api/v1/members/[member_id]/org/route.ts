@@ -2,9 +2,6 @@ import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
 import { ID, Query } from "node-appwrite";
 
-
-
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ member_id: string }> }
@@ -14,7 +11,7 @@ export async function GET(
 
     const links = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'user_link_org',
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
       [Query.equal("user_id", member_id)]
     );
 
@@ -28,7 +25,7 @@ export async function GET(
 
     const orgs = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'organization',
+      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
       [Query.equal("$id", orgIds)]
     );
 
@@ -58,7 +55,7 @@ export async function PUT(
 
     const currentLinks = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'user_link_org',
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
       [Query.equal("user_id", member_id)]
     );
 
@@ -75,7 +72,7 @@ export async function PUT(
       ...linksToDelete.map((doc) =>
         database.deleteDocument(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
-          'user_link_org',
+          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
           doc.$id
         )
       ),
@@ -83,7 +80,7 @@ export async function PUT(
       ...idsToAdd.map((org_id) =>
         database.createDocument(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
-          'user_link_org',
+          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
           ID.unique(),
           {
             user_id: member_id,
@@ -125,7 +122,7 @@ export async function DELETE(
 
     const targetLink = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'user_link_org',
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
       [Query.equal("user_id", member_id), Query.equal("org_id", org_id)]
     );
 
@@ -138,7 +135,7 @@ export async function DELETE(
 
     await database.deleteDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'user_link_org',
+      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
       targetLink.documents[0].$id
     );
 

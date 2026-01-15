@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
 
-
-
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ org_id: string }> }
@@ -12,7 +10,7 @@ export async function GET(
 
     const org = await database.getDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'organization',
+      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
       org_id
     );
 
@@ -42,7 +40,7 @@ export async function PATCH(
 
     const updatedOrg = await database.updateDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'organization',
+      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
       org_id,
       body
     );
@@ -63,7 +61,11 @@ export async function DELETE(
   try {
     const { org_id } = await params;
 
-    await database.deleteDocument(process.env.NEXT_APPWRITE_DATABASE_ID!, 'organization', org_id);
+    await database.deleteDocument(
+      process.env.NEXT_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
+      org_id
+    );
 
     return NextResponse.json({
       message: "Organization deleted successfully",

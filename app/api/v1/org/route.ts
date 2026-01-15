@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
 import { ID, Query } from "node-appwrite";
 
-
 export async function GET(request: Request) {
   try {
-    const orgs = await database.listDocuments(process.env.NEXT_APPWRITE_DATABASE_ID!, 'organization', [
-      Query.orderDesc("$createdAt"),
-    ]);
+    const orgs = await database.listDocuments(
+      process.env.NEXT_APPWRITE_DATABASE_ID!,
+      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
+      [Query.orderDesc("$createdAt")]
+    );
 
     return NextResponse.json(orgs.documents);
   } catch (error: any) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
 
     const newOrg = await database.createDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      'organization',
+      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
       ID.unique(),
       {
         name: name,

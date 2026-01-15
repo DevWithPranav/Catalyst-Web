@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { database } from "@/lib/appwrite/server";
+import { database, storage } from "@/lib/appwrite/server";
 import { ID } from "node-appwrite";
+
 
 export async function GET(request: Request) {
   try {
@@ -16,54 +17,86 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const formData = await request.formData();
 
-    if (!body) {
-      return NextResponse.json(
-        { status: 400, message: "provide valid data" },
-        { status: 400 }
-      );
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    
+    const rolesRaw = formData.get("roles") as string;
+    const orgsRaw = formData.get("orgs") as string;
+    
+    let roles: string[] = [];
+    let orgs: string[] = [];
+    
+    try {
+        if (rolesRaw) roles = JSON.parse(rolesRaw);
+        if (orgsRaw) orgs = JSON.parse(orgsRaw);
+    } catch (e) {
+        console.warn("Failed to parse roles/orgs JSON", e);
     }
 
-    const { roles, orgs, ...memberDetails } = body;
+    const file = formData.get("photo");
+    let photoUrl: string | null = null; 
+
+    if (file && file instanceof File && file.size > 0) {
+        console.log("Uploading file:", file.name);
+
+        const uploadedFile = await storage.createFile(
+            process.env.NEXT_APPWRITE_BUCKET_ID!,
+            ID.unique(),
+            file
+        );
+
+        const projectId = process.env.NEXT_APPWRITE_PROJECT_ID; 
+        const endpoint = process.env.NEXT_APPWRITE_ENDPOINT;
+        
+        photoUrl = `${endpoint}/storage/buckets/${process.env.NEXT_APPWRITE_BUCKET_ID}/files/${uploadedFile.$id}/view?project=${projectId}`;
+    } else {
+        const rawString = formData.get("photo") as string;
+        if (rawString && rawString.startsWith("http")) {
+            photoUrl = rawString;
+        }
+    }
 
     const new_member = await database.createDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
       process.env.NEXT_PUBLIC_APPWRITE_MEMBER_COLLECTION_ID!,
       ID.unique(),
-      memberDetails
+      {
+          name,
+          email,
+          phone,
+          photo: photoUrl, 
+          join_date: new Date().toISOString()
+      }
     );
 
+    // ... (Link creation logic stays the same) ...
     const new_member_id = new_member.$id;
     const promises = [];
 
-    if (roles && Array.isArray(roles)) {
-      roles.forEach((role_id: string) => {
+    if (roles.length > 0) {
+      roles.forEach((role_id) => {
         promises.push(
           database.createDocument(
             process.env.NEXT_APPWRITE_DATABASE_ID!,
             "user_link_roles",
             ID.unique(),
-            {
-              user_id: new_member_id,
-              role_id: role_id,
-            }
+            { user_id: new_member_id, role_id: role_id }
           )
         );
       });
     }
 
-    if (orgs && Array.isArray(orgs)) {
-      orgs.forEach((org_id: string) => {
+    if (orgs.length > 0) {
+      orgs.forEach((org_id) => {
         promises.push(
           database.createDocument(
             process.env.NEXT_APPWRITE_DATABASE_ID!,
             "user_link_org",
             ID.unique(),
-            {
-              user_id: new_member_id,
-              org_id: org_id,
-            }
+            { user_id: new_member_id, org_id: org_id }
           )
         );
       });
@@ -73,10 +106,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ...new_member,
-      message: "Member and relationships created successfully",
-      linked_roles_count: roles?.length || 0,
-      linked_orgs_count: orgs?.length || 0,
+      message: "Member created successfully",
+      photo_url: photoUrl,
     });
+
   } catch (error: any) {
     console.error("POST Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

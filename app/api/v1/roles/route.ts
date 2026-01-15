@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   try {
     const roles = await database.listDocuments(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "role",
+      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
       [Query.orderDesc("$createdAt")]
     );
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     const newRole = await database.createDocument(
       process.env.NEXT_APPWRITE_DATABASE_ID!,
-      "role",
+      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
       ID.unique(),
       {
         name: name,
