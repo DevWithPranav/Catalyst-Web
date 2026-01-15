@@ -1,80 +1,101 @@
+"use client";
 import React from "react";
-import { Timeline } from "@/components/ui/timeline";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
-export default function TimelineDemo() {
+interface TimelineItemProps {
+  year: string;
+  content: string;
+  width: number;
+}
+
+const TimelineItem: React.FC<TimelineItemProps> = ({
+  year,
+  content,
+  width,
+}) => {
+  return (
+    <div
+      className="relative flex flex-col items-center shrink-0"
+      style={{ width }}
+    >
+      <h1 className="text-white text-2xl font-primary mb-4">{year}</h1>
+
+      <div className="relative h-6 flex items-center justify-center">
+        <div className="w-6 h-6 bg-white rounded-full shadow-[0_0_10px_4px_rgba(255,255,255,0.6)] z-10" />
+      </div>
+
+      <p className="text-xs md:text-sm font-secondary text-white text-center mt-4 px-4">
+        {content}
+      </p>
+    </div>
+  );
+};
+
+const Timeline = () => {
+  const { width: screenWidth } = useWindowSize();
+  function getItemWidth(screenWidth: number) {
+    if (screenWidth >= 1280) return 320; // xl
+    if (screenWidth >= 1024) return 260; // lg
+    if (screenWidth >= 768) return 300; // md
+    if (screenWidth >= 640) return 200; // sm
+    return 160; // base
+  }
   const data = [
     {
-      title: "2024",
-      content: (
-        <div>
-          <p className="mb-8 text-xs md:text-sm font-normal text-white">
-            Catalyst evolved into a full-scale innovation and entrepreneurship
-            platform, bringing together students, mentors, and industry partners
-            through curated programs, workshops, and collaborative initiatives.
-            The focus shifted from experimentation to execution, with systems
-            designed for scalability and long-term impact.
-          </p>
-        </div>
-      ),
+      year: "2021",
+      content:
+        "Catalyst, the Innovation and Entrepreneurship Centre of MBCET, was inaugurated",
     },
     {
-      title: "Early 2023",
-      content: (
-        <div>
-          <p className="mb-4 text-xs md:text-sm font-normal text-white">
-            The foundation of Catalyst was laid with a small core team exploring
-            how technology, design, and engineering could intersect to solve
-            real-world problems within the campus ecosystem.
-          </p>
-          <p className="mb-8 text-xs md:text-sm font-normal text-white">
-            Early efforts focused on rapid prototyping, community building, and
-            validating ideas through hands-on projects, discussions, and
-            internal showcases that shaped the direction of the initiative.
-          </p>
-        </div>
-      ),
+      year: "2022",
+      content:
+        "The Media Lab of the Massachusetts Institute of Technology (MIT) conducted a Design Innovation and DIY Workshop",
     },
     {
-      title: "2025",
-      content: (
-        <div>
-          <p className="mb-4 text-xs md:text-sm font-normal text-white">
-            Recent updates reflect continuous refinement of the Catalyst
-            platform, with improvements aimed at usability, collaboration, and
-            outreach.
-          </p>
-
-          <div className="mb-8 space-y-2">
-            <div className="text-xs md:text-sm text-white">
-              Introduced a unified platform identity and design system.
-            </div>
-            <div className="text-xs md:text-sm text-white">
-              Launched structured innovation tracks for students and teams.
-            </div>
-            <div className="text-xs md:text-sm text-white">
-              Improved internal tooling for event coordination and content
-              publishing.
-            </div>
-            <div className="text-xs md:text-sm text-white">
-              Expanded mentorship access through industry and alumni
-              connections.
-            </div>
-            <div className="text-xs md:text-sm text-white">
-              Streamlined onboarding for new contributors and collaborators.
-            </div>
-          </div>
-        </div>
-      ),
+      year: "2023",
+      content:
+        "The MIT Media Lab also organized a Design Thinking and DIY Workshop",
+    },
+    {
+      year: "2024",
+      content:
+        "The MIT Media Lab also organized a Design Thinking and DIY Workshop",
     },
   ];
 
-  return (
-    <div className="relative w-full overflow-clip ">
-      <h2 className="text-3xl font-primary mb-3 text-center text-white mx-5 mt-50">
-        TIMELINE
-      </h2>
+  const ITEM_WIDTH = getItemWidth(screenWidth);
+  const DOT_CENTER_X = ITEM_WIDTH / 2;
 
-      <Timeline data={data} />
+  return (
+    <div className="flex flex-col items-center mt-15 md:px-15">
+      <h1 className="text-3xl text-white font-primary md:text-4xl">TIMELINE</h1>
+
+      <div className="relative w-full overflow-x-auto">
+        <div
+          className="relative flex items-start py-12"
+          style={{ width: data.length * ITEM_WIDTH }}
+        >
+          <div
+            className="absolute h-[4px] bg-white"
+            style={{
+              top: 105,
+              left: DOT_CENTER_X,
+              width: data.length * ITEM_WIDTH - ITEM_WIDTH,
+            }}
+          />
+
+          {data.map((item, i) => (
+            <TimelineItem
+              key={i}
+              year={item.year}
+              content={item.content}
+              width={ITEM_WIDTH}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Timeline;

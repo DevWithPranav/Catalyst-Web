@@ -10,7 +10,7 @@ import Connect from "@/components/home/Connect";
 const page = () => {
 
   return (
-    <div>
+    <div className="mb-5 md:mb-20">
       <Hero />
       <About />
       <TimelineDemo />

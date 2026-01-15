@@ -16,8 +16,8 @@ const Navbar = () => {
       path: "/events",
     },
     {
-      page: "Team",
-      path: "/team",
+      page: "Achievements",
+      path: "/achievements",
     },
     {
       page: "Execom",
@@ -28,8 +28,8 @@ const Navbar = () => {
       path: "/mulearn",
     },
     {
-      page: "About",
-      path: "/about",
+      page: "Gallery",
+      path: "/gallery",
     },
   ];
 
@@ -37,7 +37,7 @@ const Navbar = () => {
     <div className="flex fixed z-[300] top-0 w-screen py-4 px-8 lg:px-14 justify-between bg-[#0000] backdrop-blur-2xl items-center overflow-hidden text-white">
       {/* Logo */}
       <Link href={"/"} className="font-bold text-2xl">
-        <img className="h-10" src="Catalyst_Logo_Navbar.png" alt="" />
+        <img className="h-10" src="/Catalyst_Logo_Navbar.png" alt="" />
       </Link>
 
       {/* Desktop Navigation */}

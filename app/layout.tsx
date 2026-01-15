@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import MobileMenu from "@/components/MobileMenu";
 import Footer from "@/components/Footer";
 import { StickyBanner } from "@/components/ui/sticky-banner";
+import FooterDesk from "@/components/FooterDesk";
 const monument = localFont({
   src: [
     {
@@ -23,51 +24,15 @@ const monument = localFont({
 
 const poppins = localFont({
   src: [
-    {
-      path: "../public/fonts/Poppins-Thin.ttf",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-ExtraLight.ttf",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-Light.ttf",
-      weight: "300",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-Medium.ttf",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-SemiBold.ttf",
-      weight: "600",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-ExtraBold.ttf",
-      weight: "800",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Poppins-Black.ttf",
-      weight: "900",
-      style: "normal",
-    },
+    { path: "../public/fonts/Poppins-Thin.ttf", weight: "100" },
+    { path: "../public/fonts/Poppins-ExtraLight.ttf", weight: "200" },
+    { path: "../public/fonts/Poppins-Light.ttf", weight: "300" },
+    { path: "../public/fonts/Poppins-Regular.ttf", weight: "400" },
+    { path: "../public/fonts/Poppins-Medium.ttf", weight: "500" },
+    { path: "../public/fonts/Poppins-SemiBold.ttf", weight: "600" },
+    { path: "../public/fonts/Poppins-Bold.ttf", weight: "700" },
+    { path: "../public/fonts/Poppins-ExtraBold.ttf", weight: "800" },
+    { path: "../public/fonts/Poppins-Black.ttf", weight: "900" },
   ],
   variable: "--font-poppins",
 });
@@ -79,34 +44,46 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`${monument.variable} ${poppins.variable}`}>
-        <div className="relative min-h-screen bg-background">
+        {/* App wrapper */}
+        <div className="relative min-h-screen bg-background overflow-x-hidden">
+          {/* 🔒 Background texture layer */}
           <div
-            className="absolute inset-0 opacity-7 pointer-events-none"
+            className="absolute inset-0 z-0 opacity-4 pointer-events-none"
             style={{
               backgroundImage: "url('/images/Logo.svg')",
-              backgroundRepeat: "repeat-y",
-              backgroundSize: "1200px 1200px 1200px",
-              backgroundPosition: "center top center",
+              backgroundRepeat: "repeat",
+              backgroundSize: "1200px",
+              backgroundPosition: "center top",
             }}
           />
 
-          <div className="relative z-10">
-            <Navbar />
-            <StickyBanner>
-              Relevent 2025 - Register Now- Gateway to Leadership and Innovation
-            </StickyBanner>
+          {/* 🔝 UI layer */}
+          <div className="relative z-10 flex flex-col min-h-screen">
+            {/* Navbar must always win */}
+            <div className="relative z-50">
+              <Navbar />
+              <StickyBanner>
+                Relevent 2025 – Register Now – Gateway to Leadership and
+                Innovation
+              </StickyBanner>
+              <MobileMenu />
+            </div>
 
-            <MobileMenu />
+            {/* Page content */}
+            <main className="flex-1">{children}</main>
 
-            {children}
-
-            <Footer />
+            <div className="md:hidden">
+              <Footer />
+            </div>
+            <div className="hidden md:block">
+              <FooterDesk />
+            </div>
           </div>
         </div>
       </body>

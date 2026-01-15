@@ -2,7 +2,7 @@
 import React from "react";
 const Footer = () => {
   return (
-    <div className="mt-20 mx-5 mb-10">
+    <div className=" mx-5 mb-10">
       <div className="relative rounded-2xl p-[0.5px]">
         {/* Gradient border */}
         <div

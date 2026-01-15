@@ -8,10 +8,10 @@ const MobileMenu = () => {
   const links = [
     { page: "Home", path: "/" },
     { page: "Events", path: "/events" },
-    { page: "Team", path: "/team" },
+    { page: "Achievements", path: "/achievements" },
     { page: "Execom", path: "/execom" },
     { page: "MuLearn", path: "/mulearn" },
-    { page: "About", path: "/about" },
+    { page: "Gallery", path: "/gallery" },
   ];
 
   useEffect(() => {

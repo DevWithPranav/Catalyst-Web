@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
     // ... (Link creation logic stays the same) ...
     const new_member_id = new_member.$id;
-    const promises = [];
+    const promises: Promise<any>[] = [];
 
     if (roles.length > 0) {
       roles.forEach((role_id) => {
