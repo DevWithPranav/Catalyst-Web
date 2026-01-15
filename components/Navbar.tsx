@@ -16,8 +16,8 @@ const Navbar = () => {
       path: "/events",
     },
     {
-      page: "Team",
-      path: "/team",
+      page: "Achievements",
+      path: "/achievements",
     },
     {
       page: "Execom",
@@ -28,8 +28,8 @@ const Navbar = () => {
       path: "/mulearn",
     },
     {
-      page: "About",
-      path: "/about",
+      page: "Gallery",
+      path: "/gallery",
     },
   ];
 

@@ -5,7 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import LogoContainer from "@/components/LogoContainer";
 import { Environment, OrbitControls } from "@react-three/drei";
 import { DM_Sans, Darker_Grotesque } from "next/font/google";
-import { useWindowSize } from "@/app/hooks/useWindowSize";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 const dm = Darker_Grotesque({ subsets: ["latin"] });
 

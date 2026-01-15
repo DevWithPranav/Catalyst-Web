@@ -1,6 +1,6 @@
 "use client";
 
-import { useWindowSize } from "@/app/hooks/useWindowSize";
+import { useWindowSize } from "@/hooks/useWindowSize";
 const About = () => {
   const { width } = useWindowSize();
   return (
