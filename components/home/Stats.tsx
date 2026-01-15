@@ -3,10 +3,12 @@ import Card from "@/components/Card";
 const Stats = () => {
   return (
     <div>
-      <h1 className="text-3xl text-center text-white font-primary mx-5 mt-27 mb-10">
+      <h1 className="text-3xl text-center text-white font-primary mx-5 mt-27 mb-10 md:mb-1 md:text-5xl">
         CATALYST MATRIX
       </h1>
-      <div className="mx-8 grid grid-cols-1 gap-5">
+      <div className="mx-8 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7 md:p-9">
+        <Card />
+        <Card />
         <Card />
         <Card />
         <Card />

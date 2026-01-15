@@ -52,16 +52,16 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
                 />
               </div>
 
-              <h3 className="hidden md:block text-xl md:pl-20 md:text-5xl font-bold text-white">
+              <h3 className="hidden md:block text-2xl md:pl-20 md:text-5xl font-bold text-white">
                 {item.title.toUpperCase()}
               </h3>
             </div>
 
             <div className="relative pl-20 pr-4 md:pl-4 w-full">
-              <h3 className="md:hidden block text-2xl mb-4 text-left  text-white">
+              <h3 className="md:hidden block text-xl mb-4 text-left  text-white">
                 {item.title.toUpperCase()}
               </h3>
-              <div className="font-secondary">{item.content}</div>
+              <div className="font-secondary ">{item.content}</div>
             </div>
           </div>
         ))}

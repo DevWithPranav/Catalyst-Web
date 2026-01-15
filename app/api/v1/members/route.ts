@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     );
 
     const new_member_id = new_member.$id;
-    const promises = [];
+    const promises: Promise<any>[] = [];
 
     if (roles && Array.isArray(roles)) {
       roles.forEach((role_id: string) => {

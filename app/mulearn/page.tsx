@@ -91,7 +91,7 @@ const MuLearn = () => {
                     spinDuration={20}
                     onHover="speedUp"
                     className="text-white scale-80 "
-                    centerSymbolSize={28}
+                    centerSymbolSize={23}
                     size={100}
                     whiteOffset={1}
                   />

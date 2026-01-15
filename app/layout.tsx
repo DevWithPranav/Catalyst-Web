@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import MobileMenu from "@/components/MobileMenu";
 import Footer from "@/components/Footer";
 import { StickyBanner } from "@/components/ui/sticky-banner";
-
+import FooterDesk from "@/components/FooterDesk";
 const monument = localFont({
   src: [
     {
@@ -54,11 +54,11 @@ export default function RootLayout({
         <div className="relative min-h-screen bg-background overflow-x-hidden">
           {/* 🔒 Background texture layer */}
           <div
-            className="absolute inset-0 z-0 opacity-7 pointer-events-none"
+            className="absolute inset-0 z-0 opacity-4 pointer-events-none"
             style={{
               backgroundImage: "url('/images/Logo.svg')",
-              backgroundRepeat: "repeat-y",
-              backgroundSize: "1200px 1200px",
+              backgroundRepeat: "repeat",
+              backgroundSize: "1200px",
               backgroundPosition: "center top",
             }}
           />
@@ -78,8 +78,12 @@ export default function RootLayout({
             {/* Page content */}
             <main className="flex-1">{children}</main>
 
-            {/* Footer */}
-            <Footer />
+            <div className="md:hidden">
+              <Footer />
+            </div>
+            <div className="hidden md:block">
+              <FooterDesk />
+            </div>
           </div>
         </div>
       </body>
