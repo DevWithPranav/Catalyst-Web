@@ -24,7 +24,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
         <div className="w-6 h-6 bg-white rounded-full shadow-[0_0_10px_4px_rgba(255,255,255,0.6)] z-10" />
       </div>
 
-      <p className="text-xs md:text-sm font-secondary text-white text-center mt-4 px-4 sm:text-xl">
+      <p className="text-xs md:text-sm font-secondary text-white text-center mt-4 px-4 sm:text-lg">
         {content}
       </p>
     </div>
@@ -34,8 +34,8 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 const Timeline = () => {
   const { width: screenWidth } = useWindowSize();
   function getItemWidth(screenWidth: number) {
-    if (screenWidth >= 1280) return 320; // xl
-    if (screenWidth >= 1024) return 370; // lg
+    if (screenWidth >= 1280) return 400; // xl
+    if (screenWidth >= 1024) return 350; // lg
     if (screenWidth >= 768) return 300; // md
     if (screenWidth >= 640) return 350; // sm
     return 200; // base

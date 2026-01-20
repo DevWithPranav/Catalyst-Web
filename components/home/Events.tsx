@@ -1,8 +1,7 @@
 import React from "react";
 import EventCard from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight } from "lucide-react";
-import Image from "next/image";
+
 const ButtonNew = () => {
   return (
     <Button

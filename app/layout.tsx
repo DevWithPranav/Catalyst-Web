@@ -78,7 +78,7 @@ export default function RootLayout({
             {/* Page content */}
             <main className="flex-1">{children}</main>
 
-            <div className="md:hidden sm:hidden">
+            <div className="md:hidden sm:hidden mt-5">
               <Footer />
             </div>
             <div className="hidden md:block sm:block sm:mx-15 lg:mx-0">
