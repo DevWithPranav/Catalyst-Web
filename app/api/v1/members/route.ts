@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { database, storage } from "@/lib/appwrite/server";
-import { ID } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 
 
 export async function GET(request: Request) {
@@ -19,14 +19,14 @@ export async function GET(request: Request) {
         const roleLinks = await database.listDocuments(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
           "user_link_roles",
-          [`user_id=${memberId}`]
+          [Query.equal('user_id', memberId)]
         );
 
         // Fetch org links
         const orgLinks = await database.listDocuments(
           process.env.NEXT_APPWRITE_DATABASE_ID!,
           "user_link_org",
-          [`user_id=${memberId}`]
+          [Query.equal('user_id', memberId)]
         );
 
         // Fetch actual role documents
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
             try {
               const role = await database.getDocument(
                 process.env.NEXT_APPWRITE_DATABASE_ID!,
-                process.env.NEXT_PUBLIC_APPWRITE_ROLES_COLLECTION_ID!,
+                process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
                 link.role_id
               );
               return role;
@@ -52,7 +52,7 @@ export async function GET(request: Request) {
             try {
               const org = await database.getDocument(
                 process.env.NEXT_APPWRITE_DATABASE_ID!,
-                process.env.NEXT_PUBLIC_APPWRITE_ORG_COLLECTION_ID!,
+                process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
                 link.org_id
               );
               return org;
