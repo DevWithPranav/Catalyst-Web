@@ -2,7 +2,7 @@ import React from "react";
 
 const FooterDesk = () => {
   return (
-    <div className="relative rounded-2xl p-[0.5px] md:mx-15 mb-5">
+    <div className="relative rounded-2xl p-[0.5px] md:mx-15 mb-5 ">
       {/* Border gradient */}
       <div
         className="absolute inset-0 rounded-2xl"
@@ -13,7 +13,7 @@ const FooterDesk = () => {
       />
 
       {/* Content */}
-      <div className="relative rounded-2xl bg-gradient-to-b from-[#1D1D1D] to-[#0B0B0B] overflow-hidden h-[280px]">
+      <div className="relative rounded-2xl bg-gradient-to-b from-[#1D1D1D] to-[#0B0B0B] overflow-hidden h-[280px] lg:h-150">
         {/* CENTER CONTENT */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-10">
           <h1 className="text-white font-primary text-xl md:text-2xl">
@@ -34,6 +34,7 @@ const FooterDesk = () => {
             absolute bottom-[-12%] left-0 w-full
             flex items-center justify-center
             pointer-events-none
+            lg:bottom-[-15%]
           "
         >
           {/* Ghost CATALYST */}
@@ -44,6 +45,7 @@ const FooterDesk = () => {
               opacity-5
               text-white
               select-none
+              lg:text-[15rem]
             "
           >
             CATALYST

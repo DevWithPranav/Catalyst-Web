@@ -8,18 +8,18 @@ import Pioneers from "@/components/home/Team";
 import Connect from "@/components/home/Connect";
 
 const page = () => {
-
   return (
-    <div className="mb-5 md:mb-20">
+    <div className="mb-5 md:mb-20 ">
       <Hero />
       <About />
       <TimelineDemo />
 
       <Stats />
       <Events />
-      <Pioneers />
-      <Connect />
-
+      <div className="lg:grid grid-cols-2">
+        <Pioneers />
+        <Connect />
+      </div>
     </div>
   );
 };

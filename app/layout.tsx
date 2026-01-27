@@ -54,7 +54,7 @@ export default function RootLayout({
         <div className="relative min-h-screen bg-background overflow-x-hidden">
           {/* 🔒 Background texture layer */}
           <div
-            className="absolute inset-0 z-0 opacity-4 pointer-events-none"
+            className="absolute inset-0 z-0 opacity-7 pointer-events-none"
             style={{
               backgroundImage: "url('/images/Logo.svg')",
               backgroundRepeat: "repeat",
@@ -78,10 +78,10 @@ export default function RootLayout({
             {/* Page content */}
             <main className="flex-1">{children}</main>
 
-            <div className="md:hidden">
+            <div className="md:hidden sm:hidden mt-5">
               <Footer />
             </div>
-            <div className="hidden md:block">
+            <div className="hidden md:block sm:block sm:mx-15 lg:mx-0">
               <FooterDesk />
             </div>
           </div>

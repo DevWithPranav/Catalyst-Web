@@ -18,13 +18,13 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
       className="relative flex flex-col items-center shrink-0"
       style={{ width }}
     >
-      <h1 className="text-white text-2xl font-primary mb-4">{year}</h1>
+      <h1 className="text-white text-2xl font-primary mb-4 sm:text-3xl">{year}</h1>
 
       <div className="relative h-6 flex items-center justify-center">
         <div className="w-6 h-6 bg-white rounded-full shadow-[0_0_10px_4px_rgba(255,255,255,0.6)] z-10" />
       </div>
 
-      <p className="text-xs md:text-sm font-secondary text-white text-center mt-4 px-4">
+      <p className="text-xs md:text-sm font-secondary text-white text-center mt-4 px-4 sm:text-lg">
         {content}
       </p>
     </div>
@@ -34,11 +34,18 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 const Timeline = () => {
   const { width: screenWidth } = useWindowSize();
   function getItemWidth(screenWidth: number) {
-    if (screenWidth >= 1280) return 320; // xl
-    if (screenWidth >= 1024) return 260; // lg
+    if (screenWidth >= 1280) return 400; // xl
+    if (screenWidth >= 1024) return 350; // lg
     if (screenWidth >= 768) return 300; // md
-    if (screenWidth >= 640) return 200; // sm
-    return 160; // base
+    if (screenWidth >= 640) return 350; // sm
+    return 200; // base
+  }
+  function getLineHeight(screenWidth: number) {
+    if (screenWidth >= 1280) return 109; // xl
+    if (screenWidth >= 1024) return 110; // lg
+    if (screenWidth >= 768) return 109; // md
+    if (screenWidth >= 640) return 109; // sm
+    return 105; // base
   }
   const data = [
     {
@@ -67,8 +74,10 @@ const Timeline = () => {
   const DOT_CENTER_X = ITEM_WIDTH / 2;
 
   return (
-    <div className="flex flex-col items-center mt-15 md:px-15">
-      <h1 className="text-3xl text-white font-primary md:text-4xl">TIMELINE</h1>
+    <div className="flex flex-col items-center mt-15 md:px-15 sm:pl-10 lg:mt-50">
+      <h1 className="text-3xl text-white font-primary md:text-4xl  sm:text-4xl">
+        TIMELINE
+      </h1>
 
       <div className="relative w-full overflow-x-auto">
         <div
@@ -78,7 +87,7 @@ const Timeline = () => {
           <div
             className="absolute h-[4px] bg-white"
             style={{
-              top: 105,
+              top: getLineHeight(screenWidth),
               left: DOT_CENTER_X,
               width: data.length * ITEM_WIDTH - ITEM_WIDTH,
             }}
