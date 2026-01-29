@@ -2,6 +2,7 @@
 import React from "react";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import CircularText from "@/components/ui/shadcn-io/circular-text/circularText";
+
 const Tilted = () => {
   return (
     <div className="w-full  overflow-hidden bg-white skew-y-[-10deg]  relative py-2">
@@ -17,6 +18,7 @@ const Tilted = () => {
     </div>
   );
 };
+
 const Stats = () => {
   return (
     <div className="max-w-[300px] mx-auto flex">
@@ -35,57 +37,66 @@ const Stats = () => {
     </div>
   );
 };
+
 const MuLearn = () => {
   const stats = [1, 2, 3];
   const { width } = useWindowSize();
+
   return (
     <div>
-      <div className="flex items-center justify-center h-[50vh] bg-black overflow-hidden">
-        <div className="relative">
-          <img src="/mu.png" alt="" className="relative z-0" />
+      <div className="relative flex flex-col items-center justify-start h-[100vh] sm:h-[40vh] bg-black overflow-hidden">
+        {/* Background image and gradient layer */}
+        <div className="absolute inset-0 w-full h-full">
+          <img
+            src="/mu.png"
+            alt=""
+            className="absolute inset-0 z-0 w-full h-full object-cover opacity-20"
+          />
 
-          {/* Radial fade */}
+          {/* Radial fade from bottom */}
           <div
-            className="absolute inset-0 z-10"
+            className="absolute inset-0 z-[5]"
             style={{
               background:
-                "radial-gradient(circle, rgba(0,0,0,0) 55%, rgba(0,0,0,0.8) 100%)",
+                "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 60%)",
             }}
           />
         </div>
-      </div>
-      <div className="flex flex-col items-center justify-center">
-        <button className="bg-white text-black px-6 py-2 rounded-full font-secondary mx-auto text-sm font-semibold ">
-          Join μlearn
-        </button>
-        <div>
-          <h1 className="text-white font-primary text-3xl mt-5 text-center">
-            MULEARN <br></br>MBCET
+
+        {/* Content layer - positioned above background */}
+        <div className="relative z-[10] flex flex-col items-center justify-center gap-4 h-full px-4 mt-20">
+          <h1 className="text-white font-primary text-3xl text-center sm:text-4xl">
+            MULEARN FOUNDATION
           </h1>
-          <p className="text-white font-secondary text-center text-sm mx-10">
-            GTech µLearn is a synergic philosophy of education, with a culture
-            of mutual learning through micro peer groups. We are here to assist
-            you in breaking through the echo chambers and free you from the
-            shackles you have grounded yourself in. And we are one of the
-            campuses of the foundation.
-          </p>
+          <div>
+            <p className="text-white font-secondary text-center text-sm mx-5 text-pretty sm:text-md sm:mx-10">
+              GTech µLearn is a synergic philosophy of education, with a culture
+              of mutual learning through micro peer groups. We are here to
+              assist you in breaking through the echo chambers and free you from
+              the shackles you have grounded yourself in. And we are one of the
+              campuses of the foundation.
+            </p>
+          </div>
+          <button className="bg-white text-black px-6 py-2 rounded-full font-secondary text-sm font-semibold">
+            Join μlearn
+          </button>
         </div>
       </div>
 
-      <div className=" mt-15 flex flex-col gap-2">
+      <div className="  flex flex-col gap-2 mt-[-150] sm:mt-[-50] relative z-20">
         <Tilted />
         <div>
-          <div className="w-full   overflow-hidden bg-[linear-gradient(189.81deg,_#011B7A_15.25%,_#1100D2_37.4%,_#2B20A7_68.93%,_#07005C_102.78%)] skew-y-[-10deg] ">
-            <div className="skew-y-[10deg] max-w-[293px] mx-auto  mt-20 ">
-              <div className="mx-auto ">
+          <div className="w-full overflow-hidden bg-[linear-gradient(189.81deg,_#011B7A_15.25%,_#1100D2_37.4%,_#2B20A7_68.93%,_#07005C_102.78%)] skew-y-[-10deg] ">
+            <div className="skew-y-[10deg] w-full mx-auto mt-20 flex flex-col items-center">
+              <div className="mx-auto text-center relative">
                 {/* Heading */}
-                <h1 className=" z-10 text-white font-primary text-3xl text-left mx-8">
+                <h1 className=" z-10 text-white font-primary text-3xl text-center mx-8 sm:text-7xl">
                   CAMPUS
                 </h1>
-                <h1 className="z-10 text-white font-primary text-3xl text-left mx-8">
+                <h1 className="z-10 text-white font-primary text-3xl text-center mx-8 sm:text-7xl">
                   STATISTICS
                 </h1>
-                <div className="absolute top-0 right-0 z-20 mt-[-45] mr-[5">
+                <div className="absolute top-0 right-0 z-20 mt-[-45] mr-[-50] sm:mr-[-80]">
                   <CircularText
                     text=" MBCET • MBCET • MBCET • "
                     spinDuration={20}
@@ -127,7 +138,7 @@ const MuLearn = () => {
             interesting easter eggs!
           </p>
         </div>
-        <div className="mt-5 mr-2">
+        <div className="mt-5 mr-2 mb-[-20] ">
           <img src="/dis.svg" alt="" />
         </div>
       </div>

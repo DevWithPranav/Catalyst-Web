@@ -18,7 +18,9 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
       className="relative flex flex-col items-center shrink-0"
       style={{ width }}
     >
-      <h1 className="text-white text-2xl font-primary mb-4 sm:text-3xl">{year}</h1>
+      <h1 className="text-white text-2xl font-primary mb-4 sm:text-3xl">
+        {year}
+      </h1>
 
       <div className="relative h-6 flex items-center justify-center">
         <div className="w-6 h-6 bg-white rounded-full shadow-[0_0_10px_4px_rgba(255,255,255,0.6)] z-10" />
@@ -34,14 +36,14 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 const Timeline = () => {
   const { width: screenWidth } = useWindowSize();
   function getItemWidth(screenWidth: number) {
-    if (screenWidth >= 1280) return 400; // xl
-    if (screenWidth >= 1024) return 350; // lg
+    if (screenWidth >= 1280) return 350; // xl
+    if (screenWidth >= 1024) return 400; // lg
     if (screenWidth >= 768) return 300; // md
     if (screenWidth >= 640) return 350; // sm
     return 200; // base
   }
   function getLineHeight(screenWidth: number) {
-    if (screenWidth >= 1280) return 109; // xl
+    if (screenWidth >= 1280) return 110; // xl
     if (screenWidth >= 1024) return 110; // lg
     if (screenWidth >= 768) return 109; // md
     if (screenWidth >= 640) return 109; // sm
