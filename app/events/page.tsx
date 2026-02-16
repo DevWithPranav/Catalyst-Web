@@ -2,7 +2,8 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight } from "lucide-react";
+
+/* ---------------- MOCK DATA ---------------- */
 
 const mockEvents = [
   {
@@ -24,44 +25,35 @@ const mockEvents = [
     is_featured: false,
   },
   {
-    $id: "2",
-    title: "Design Sprint",
+    $id: "3",
+    title: "Prototype Jam",
     cover_image: "/event2.jpg",
-    start_date: "Jan 5",
-    end_date: "Jan 6",
+    start_date: "Jan 10",
+    end_date: "Jan 11",
     is_featured: false,
   },
   {
-    $id: "2",
-    title: "Design Sprint",
+    $id: "4",
+    title: "Startup Meetup",
     cover_image: "/event2.jpg",
-    start_date: "Jan 5",
-    end_date: "Jan 6",
+    start_date: "Jan 15",
+    end_date: "Jan 16",
     is_featured: false,
   },
   {
-    $id: "2",
-    title: "Design Sprint",
+    $id: "5",
+    title: "Hackathon",
     cover_image: "/event2.jpg",
-    start_date: "Jan 5",
-    end_date: "Jan 6",
+    start_date: "Jan 20",
+    end_date: "Jan 21",
     is_featured: false,
   },
 ];
 
+/* ---------------- BUTTON ---------------- */
+
 const ButtonNew = ({ link }: { link?: string }) => (
-  <Button
-    className="
-    mt-5 flex items-center gap-1
-    bg-white px-6 py-3
-    text-sm font-secondary text-black
-    transition-all duration-300
-    hover:bg-black hover:text-white hover:shadow-lg
-    group
-    [&>svg]:h-10 [&>svg]:w-10
-    md:text-2xl md:mt-10 md:px-7 md:py-7 sm:text-2xl sm:py-7 w-fit
-  "
-  >
+  <Button className="mt-5 flex items-center gap-1 bg-white px-6 py-3 text-sm font-secondary text-black transition-all duration-300 hover:bg-black hover:text-white hover:shadow-lg group md:text-2xl md:mt-10 md:px-7 md:py-7 sm:text-2xl sm:py-7 w-fit">
     Events
     <img
       src="/right.svg"
@@ -70,6 +62,8 @@ const ButtonNew = ({ link }: { link?: string }) => (
     />
   </Button>
 );
+
+/* ---------------- FEATURED CARDS ---------------- */
 
 const CardDesktop = ({ event }: any) => (
   <div className="relative rounded-2xl p-[0.5px]">
@@ -83,7 +77,7 @@ const CardDesktop = ({ event }: any) => (
     <div className="relative rounded-2xl bg-gradient-to-b from-[#1D1D1D] to-[#0B0B0B] text-white p-1 h-[40vh]">
       <div className="relative w-full h-full rounded-xl overflow-hidden flex">
         <div className="w-1/2 bg-black flex flex-col justify-center px-10 z-20">
-          <h1 className="font-primary text-2xl sm:text-4xl text-white mb-4">
+          <h1 className="font-primary text-2xl sm:text-4xl mb-4">
             {event.title}
           </h1>
           <ButtonNew link={event.register_link} />
@@ -128,6 +122,8 @@ const Card = ({ event }: any) => (
   </div>
 );
 
+/* ---------------- PAST CARD ---------------- */
+
 const Card2 = ({ event }: any) => (
   <div className="relative rounded-2xl p-[0.5px]">
     <div
@@ -153,13 +149,15 @@ const Card2 = ({ event }: any) => (
   </div>
 );
 
+/* ---------------- PAGE ---------------- */
+
 const Events = () => {
   const featured = mockEvents.find((e) => e.is_featured);
   const past = mockEvents.filter((e) => !e.is_featured);
 
   return (
     <div className="sm:mx-5 md:mx-10 lg:mx-15 sm:mb-10 mx-5 mb-5">
-      <div className="relative h-[50vh] flex items-center justify-center font-primary text-white overflow-hidden mb-[-100]">
+      <div className="relative h-[50vh] flex items-center justify-center font-primary text-white overflow-hidden">
         <h1 className="absolute text-5xl opacity-10 select-none sm:text-7xl md:text-8xl lg:text-9xl">
           CATALYST
         </h1>
@@ -183,9 +181,10 @@ const Events = () => {
         PAST EXPERIENCES
       </p>
 
-      <div className=" grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:mr-40">
-        {past.map((event) => (
-          <Card2 key={event.$id} event={event} />
+      {/* ✅ UNIQUE KEY FIX */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:mr-40 lg:grid-cols-3">
+        {past.map((event, index) => (
+          <Card2 key={`${event.$id}-${index}`} event={event} />
         ))}
       </div>
     </div>
