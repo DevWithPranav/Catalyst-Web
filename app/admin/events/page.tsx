@@ -1,7 +1,8 @@
+"use client"
 export default function AdminDashboardPage() {
     return (
         <div>
-            <h2 className="text-2xl font-bold mb-6 ">Dashboard Overview</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gray-900">Dashboard Overview</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard title="Total Users" value="128" />
@@ -10,7 +11,7 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4 ">Recent Activity</h3>
+                <h3 className="text-xl font-semibold mb-4 text-gray-800">Recent Activity</h3>
                 <div className="bg-white rounded-lg shadow p-6">
                     <p className="text-gray-600">No recent activity to display.</p>
                 </div>

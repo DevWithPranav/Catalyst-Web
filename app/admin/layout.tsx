@@ -1,15 +1,16 @@
-import AdminShell from "@/components/admin/AdminShell";
-import { getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import "./globals.css"
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const user = getCurrentUser();
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarTrigger />
+      <main className="flex-1  p-12 w-full">
 
-  if (!user) redirect("/login");
-
-  return <AdminShell>{children}</AdminShell>;
+        {children}
+      </main>
+    </SidebarProvider>
+  )
 }
