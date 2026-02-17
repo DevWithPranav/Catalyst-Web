@@ -5,3 +5,13 @@ export interface Member {
     role: string
     status: string
 }
+
+export interface Role {
+    $id: string
+    name: string
+}
+
+export interface Organization {
+    $id: string
+    name: string
+}

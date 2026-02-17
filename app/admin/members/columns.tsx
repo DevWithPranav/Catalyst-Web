@@ -225,7 +225,7 @@ export function getColumns(onEditClick?: (member: Payment) => void): ColumnDef<P
           } else {
             setAlert({
               type: "error",
-              message: `Failed to delete member: ${result.error || result.message}`
+              message: `Failed to delete member: ${result.error}`
             })
             setIsDeleting(false)
             setTimeout(() => setAlert(null), 5000)
