@@ -18,7 +18,9 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
       className="relative flex flex-col items-center shrink-0"
       style={{ width }}
     >
-      <h1 className="text-white text-2xl font-primary mb-4 sm:text-3xl">{year}</h1>
+      <h1 className="text-white text-2xl font-primary mb-4 sm:text-3xl">
+        {year}
+      </h1>
 
       <div className="relative h-6 flex items-center justify-center">
         <div className="w-6 h-6 bg-white rounded-full shadow-[0_0_10px_4px_rgba(255,255,255,0.6)] z-10" />
@@ -33,20 +35,32 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 
 const Timeline = () => {
   const { width: screenWidth } = useWindowSize();
-  function getItemWidth(screenWidth: number) {
-    if (screenWidth >= 1280) return 400; // xl
-    if (screenWidth >= 1024) return 350; // lg
-    if (screenWidth >= 768) return 300; // md
-    if (screenWidth >= 640) return 350; // sm
+
+  // ✅ Prevent hydration mismatch
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  function getItemWidth(width: number) {
+    if (width >= 1280) return 300; // xl
+    if (width >= 1024) return 300; // lg
+    if (width >= 768) return 300; // md
+    if (width >= 640) return 350; // sm
     return 200; // base
   }
-  function getLineHeight(screenWidth: number) {
-    if (screenWidth >= 1280) return 109; // xl
-    if (screenWidth >= 1024) return 110; // lg
-    if (screenWidth >= 768) return 109; // md
-    if (screenWidth >= 640) return 109; // sm
+
+  function getLineHeight(width: number) {
+    if (width >= 1280) return 109; // xl
+    if (width >= 1024) return 110; // lg
+    if (width >= 768) return 109; // md
+    if (width >= 640) return 109; // sm
     return 105; // base
   }
+
   const data = [
     {
       year: "2021",
@@ -70,12 +84,12 @@ const Timeline = () => {
     },
   ];
 
-  const ITEM_WIDTH = getItemWidth(screenWidth);
+  const ITEM_WIDTH = getItemWidth(screenWidth ?? 1024);
   const DOT_CENTER_X = ITEM_WIDTH / 2;
 
   return (
     <div className="flex flex-col items-center mt-15 md:px-15 sm:pl-10 lg:mt-50">
-      <h1 className="text-3xl text-white font-primary md:text-4xl  sm:text-4xl">
+      <h1 className="text-3xl text-white font-primary md:text-4xl sm:text-4xl">
         TIMELINE
       </h1>
 
@@ -87,7 +101,7 @@ const Timeline = () => {
           <div
             className="absolute h-[4px] bg-white"
             style={{
-              top: getLineHeight(screenWidth),
+              top: getLineHeight(screenWidth ?? 1024),
               left: DOT_CENTER_X,
               width: data.length * ITEM_WIDTH - ITEM_WIDTH,
             }}
