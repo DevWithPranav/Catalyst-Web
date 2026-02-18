@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
-import { ID, Query } from "node-appwrite";
+import { Query } from "node-appwrite";
+import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
+import { handleError, badRequest, notFound, successResponse } from "@/lib/utils/api-response";
+import { isNonEmptyString } from "@/lib/utils/validation";
 
 export async function DELETE(
   request: Request,
@@ -9,34 +11,24 @@ export async function DELETE(
   try {
     const { member_id, role_id } = await params;
 
-    const targetLink = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
-      [Query.equal("user_id", member_id), Query.equal("role_id", role_id)]
-    );
+    const targetLink = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ROLES, [
+      Query.equal("user_id", member_id),
+      Query.equal("role_id", role_id),
+    ]);
 
     if (targetLink.total === 0) {
-      return NextResponse.json(
-        { message: "User does not have this role." },
-        { status: 404 }
-      );
+      return notFound("User does not have this role");
     }
 
     await database.deleteDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
+      DB_ID,
+      COLLECTIONS.USER_LINK_ROLES,
       targetLink.documents[0].$id
     );
 
-    return NextResponse.json({
-      message: "Role removed successfully",
-      role_id: role_id,
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to remove role", details: error.message },
-      { status: 500 }
-    );
+    return successResponse({ message: "Role removed successfully", role_id });
+  } catch (error) {
+    return handleError("Remove role", error);
   }
 }
 
@@ -49,46 +41,32 @@ export async function PATCH(
     const body = await request.json();
     const { new_role_id } = body;
 
-    if (!new_role_id) {
-      return NextResponse.json(
-        { message: "Please provide 'new_role_id'." },
-        { status: 400 }
-      );
+    if (!isNonEmptyString(new_role_id)) {
+      return badRequest("'new_role_id' must be a non-empty string");
     }
 
-    const targetLink = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
-      [Query.equal("user_id", member_id), Query.equal("role_id", role_id)]
-    );
+    const targetLink = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ROLES, [
+      Query.equal("user_id", member_id),
+      Query.equal("role_id", role_id),
+    ]);
 
     if (targetLink.total === 0) {
-      return NextResponse.json(
-        { message: "User does not have the role you are trying to update." },
-        { status: 404 }
-      );
+      return notFound("User does not have the role you are trying to update");
     }
 
-    const linkDocId = targetLink.documents[0].$id;
-
     await database.updateDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
-      linkDocId,
-      {
-        role_id: new_role_id,
-      }
+      DB_ID,
+      COLLECTIONS.USER_LINK_ROLES,
+      targetLink.documents[0].$id,
+      { role_id: new_role_id }
     );
 
-    return NextResponse.json({
+    return successResponse({
       message: "Role updated successfully",
       old_role_id: role_id,
-      new_role_id: new_role_id,
+      new_role_id,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to update role", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Update role", error);
   }
 }

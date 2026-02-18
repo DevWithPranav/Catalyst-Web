@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
 import { ID, Query } from "node-appwrite";
+import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
+import { handleError, badRequest, successResponse } from "@/lib/utils/api-response";
+import { isStringArray } from "@/lib/utils/validation";
 
 export async function GET(
   request: Request,
@@ -9,32 +12,25 @@ export async function GET(
   try {
     const { member_id } = await params;
 
-    const links = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
-      [Query.equal("user_id", member_id)]
-    );
+    const links = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ROLES, [
+      Query.equal("user_id", member_id),
+    ]);
 
     const roleIds = links.documents
-      .map((doc: any) => doc.role_id.$id || doc.role_id)
-      .filter((id) => id);
+      .map((doc) => doc.role_id?.$id || doc.role_id)
+      .filter(Boolean) as string[];
 
     if (roleIds.length === 0) {
       return NextResponse.json([]);
     }
 
-    const roles = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
-      [Query.equal("$id", roleIds)]
-    );
+    const roles = await database.listDocuments(DB_ID, COLLECTIONS.ROLES, [
+      Query.equal("$id", roleIds),
+    ]);
 
     return NextResponse.json(roles.documents);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to fetch user roles", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Fetch user roles", error);
   }
 }
 
@@ -47,52 +43,45 @@ export async function POST(
     const body = await request.json();
     const { roles } = body;
 
-    if (!roles || !Array.isArray(roles)) {
-      return NextResponse.json(
-        { message: "Please provide 'roles' as an array of IDs." },
-        { status: 400 }
-      );
+    if (!roles || !Array.isArray(roles) || !isStringArray(roles)) {
+      return badRequest("'roles' must be an array of role ID strings");
     }
 
-    const currentLinks = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
-      [Query.equal("user_id", member_id)]
-    );
+    if (roles.length === 0) {
+      return badRequest("'roles' array cannot be empty");
+    }
+
+    const currentLinks = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ROLES, [
+      Query.equal("user_id", member_id),
+    ]);
 
     const currentRoleIds = currentLinks.documents.map(
-      (doc: any) => doc.role_id.$id || doc.role_id
+      (doc) => doc.role_id?.$id || doc.role_id
     );
-
-    const rolesToAdd = roles.filter((id) => !currentRoleIds.includes(id));
+    const rolesToAdd = roles.filter((id: string) => !currentRoleIds.includes(id));
 
     if (rolesToAdd.length === 0) {
-      return NextResponse.json({ message: "User already has these roles." });
+      return successResponse({ message: "User already has these roles" });
     }
 
     await Promise.all(
-      rolesToAdd.map((role_id) =>
-        database.createDocument(
-          process.env.NEXT_APPWRITE_DATABASE_ID!,
-          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ROLES_COLLECTION_ID!,
-          ID.unique(),
-          {
-            user_id: member_id,
-            role_id: role_id,
-          }
-        )
+      rolesToAdd.map((role_id: string) =>
+        database.createDocument(DB_ID, COLLECTIONS.USER_LINK_ROLES, ID.unique(), {
+          user_id: member_id,
+          role_id,
+        })
       )
     );
 
-    return NextResponse.json({
-      message: "Roles assigned successfully",
-      added_count: rolesToAdd.length,
-      roles_added: rolesToAdd,
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to assign roles", details: error.message },
-      { status: 500 }
+    return successResponse(
+      {
+        message: "Roles assigned successfully",
+        added_count: rolesToAdd.length,
+        roles_added: rolesToAdd,
+      },
+      201
     );
+  } catch (error) {
+    return handleError("Assign roles", error);
   }
 }
