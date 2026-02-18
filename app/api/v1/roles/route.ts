@@ -1,22 +1,35 @@
 import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
 import { ID, Query } from "node-appwrite";
+import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
+import { handleError, badRequest } from "@/lib/utils/api-response";
+import { parsePagination, paginationQueries } from "@/lib/utils/pagination";
 
 export async function GET(request: Request) {
   try {
-    const roles = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
-      [Query.orderDesc("$createdAt")]
-    );
+    const pagination = parsePagination(request);
+    const url = new URL(request.url);
 
-    return NextResponse.json(roles.documents);
-  } catch (error: any) {
-    console.error("GET Roles Error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch roles", details: error.message },
-      { status: 500 }
-    );
+    const queries = [
+      ...paginationQueries(pagination),
+      Query.orderDesc("$createdAt"),
+    ];
+
+    const search = url.searchParams.get("search");
+    if (search) {
+      queries.push(Query.search("name", search));
+    }
+
+    const roles = await database.listDocuments(DB_ID, COLLECTIONS.ROLES, queries);
+
+    return NextResponse.json({
+      documents: roles.documents,
+      total: roles.total,
+      page: Math.floor(pagination.offset / pagination.limit) + 1,
+      limit: pagination.limit,
+    });
+  } catch (error) {
+    return handleError("Fetch roles", error);
   }
 }
 
@@ -25,28 +38,23 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name } = body;
 
-    if (!name) {
-      return NextResponse.json(
-        { message: "Role name is required" },
-        { status: 400 }
-      );
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      return badRequest("Role name is required");
+    }
+
+    if (name.trim().length > 255) {
+      return badRequest("Role name must be at most 255 characters");
     }
 
     const newRole = await database.createDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ROLE_COLLECTION_ID!,
+      DB_ID,
+      COLLECTIONS.ROLES,
       ID.unique(),
-      {
-        name: name,
-      }
+      { name: name.trim() } as Record<string, unknown>
     );
 
     return NextResponse.json(newRole, { status: 201 });
-  } catch (error: any) {
-    console.error("POST Roles Error:", error);
-    return NextResponse.json(
-      { error: "Failed to create role", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Create role", error);
   }
 }

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
 import { ID, Query } from "node-appwrite";
+import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
+import { handleError, badRequest, notFound, successResponse } from "@/lib/utils/api-response";
+import { isStringArray, isNonEmptyString } from "@/lib/utils/validation";
 
 export async function GET(
   request: Request,
@@ -9,32 +12,25 @@ export async function GET(
   try {
     const { member_id } = await params;
 
-    const links = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
-      [Query.equal("user_id", member_id)]
-    );
+    const links = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ORG, [
+      Query.equal("user_id", member_id),
+    ]);
 
     const orgIds = links.documents
-      .map((doc: any) => doc.org_id.$id || doc.org_id)
-      .filter((id) => id);
+      .map((doc) => doc.org_id?.$id || doc.org_id)
+      .filter(Boolean) as string[];
 
     if (orgIds.length === 0) {
       return NextResponse.json([]);
     }
 
-    const orgs = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
-      [Query.equal("$id", orgIds)]
-    );
+    const orgs = await database.listDocuments(DB_ID, COLLECTIONS.ORGANIZATIONS, [
+      Query.equal("$id", orgIds),
+    ]);
 
     return NextResponse.json(orgs.documents);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to fetch user organizations", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Fetch user organizations", error);
   }
 }
 
@@ -46,61 +42,42 @@ export async function PUT(
     const { member_id } = await params;
     const { orgs } = await request.json();
 
-    if (!Array.isArray(orgs)) {
-      return NextResponse.json(
-        { message: "Invalid format. 'orgs' must be an array of IDs." },
-        { status: 400 }
-      );
+    if (!Array.isArray(orgs) || !isStringArray(orgs)) {
+      return badRequest("'orgs' must be an array of organization ID strings");
     }
 
-    const currentLinks = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
-      [Query.equal("user_id", member_id)]
-    );
+    const currentLinks = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ORG, [
+      Query.equal("user_id", member_id),
+    ]);
 
     const linksToDelete = currentLinks.documents.filter(
-      (doc: any) => !orgs.includes(doc.org_id.$id || doc.org_id)
+      (doc) => !orgs.includes(doc.org_id?.$id || doc.org_id)
     );
-
     const currentOrgIds = currentLinks.documents.map(
-      (doc: any) => doc.org_id.$id || doc.org_id
+      (doc) => doc.org_id?.$id || doc.org_id
     );
-    const idsToAdd = orgs.filter((id) => !currentOrgIds.includes(id));
+    const idsToAdd = orgs.filter((id: string) => !currentOrgIds.includes(id));
 
     await Promise.all([
       ...linksToDelete.map((doc) =>
-        database.deleteDocument(
-          process.env.NEXT_APPWRITE_DATABASE_ID!,
-          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
-          doc.$id
-        )
+        database.deleteDocument(DB_ID, COLLECTIONS.USER_LINK_ORG, doc.$id)
       ),
-
-      ...idsToAdd.map((org_id) =>
-        database.createDocument(
-          process.env.NEXT_APPWRITE_DATABASE_ID!,
-          process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
-          ID.unique(),
-          {
-            user_id: member_id,
-            org_id: org_id,
-          }
-        )
+      ...idsToAdd.map((org_id: string) =>
+        database.createDocument(DB_ID, COLLECTIONS.USER_LINK_ORG, ID.unique(), {
+          user_id: member_id,
+          org_id,
+        })
       ),
     ]);
 
-    return NextResponse.json({
+    return successResponse({
       message: "Organizations synced successfully",
       added: idsToAdd.length,
       removed: linksToDelete.length,
       current_total: orgs.length,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to update organizations", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Update organizations", error);
   }
 }
 
@@ -113,40 +90,30 @@ export async function DELETE(
     const body = await request.json();
     const { org_id } = body;
 
-    if (!org_id) {
-      return NextResponse.json(
-        { message: "Please provide 'org_id' to remove." },
-        { status: 400 }
-      );
+    if (!isNonEmptyString(org_id)) {
+      return badRequest("'org_id' must be a non-empty string");
     }
 
-    const targetLink = await database.listDocuments(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
-      [Query.equal("user_id", member_id), Query.equal("org_id", org_id)]
-    );
+    const targetLink = await database.listDocuments(DB_ID, COLLECTIONS.USER_LINK_ORG, [
+      Query.equal("user_id", member_id),
+      Query.equal("org_id", org_id),
+    ]);
 
     if (targetLink.total === 0) {
-      return NextResponse.json(
-        { message: "User is not linked to this organization." },
-        { status: 404 }
-      );
+      return notFound("User is not linked to this organization");
     }
 
     await database.deleteDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_USER_LINK_ORG_COLLECTION_ID!,
+      DB_ID,
+      COLLECTIONS.USER_LINK_ORG,
       targetLink.documents[0].$id
     );
 
-    return NextResponse.json({
+    return successResponse({
       message: "User removed from organization successfully",
-      org_id: org_id,
+      org_id,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to remove organization", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Remove organization", error);
   }
 }
