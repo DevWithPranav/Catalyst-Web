@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Calendar, Home, Users, Shield, Trophy } from "lucide-react"
 
 import {
   Sidebar,
@@ -21,7 +21,7 @@ const items = [
   {
     title: "Members",
     url: "/admin/members",
-    icon: Inbox,
+    icon: Users,
   },
   {
     title: "Events",
@@ -31,19 +31,19 @@ const items = [
   {
     title: "Roles",
     url: "/admin/roles",
-    icon: Search,
+    icon: Shield,
   },
   {
     title: "Achievements",
     url: "/admin/achievements",
-    icon: Settings,
+    icon: Trophy,
   },
 ]
 
 export function AppSidebar() {
   return (
-    <Sidebar>
-      <SidebarContent>
+    <Sidebar >
+      <SidebarContent className="shadow-xl">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>

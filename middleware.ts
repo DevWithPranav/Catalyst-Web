@@ -7,7 +7,9 @@ export function middleware(req: NextRequest) {
   if (isApiRoute) {
     // TODO: Replace with real authentication (e.g. session cookie / JWT validation)
     const authHeader = req.headers.get("authorization");
-
+    if(process.env.NODE_ENV === "development") {
+      return NextResponse.next();
+    }
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { error: "Authentication credentials were not provided" },

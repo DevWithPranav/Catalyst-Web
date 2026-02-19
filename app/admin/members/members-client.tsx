@@ -225,7 +225,7 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
                         <DrawerTrigger asChild>
                             <Button variant="outline"><Plus />Add User</Button>
                         </DrawerTrigger>
-                        <DrawerContent className="no-scrollbar overflow-y-auto">
+                        <DrawerContent className="no-scrollbar overflow-y-auto overflow-x-hidden">
                             <AddMemberForm
                                 roles={roles}
                                 organizations={organizations}

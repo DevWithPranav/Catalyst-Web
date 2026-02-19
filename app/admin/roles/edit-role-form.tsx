@@ -63,7 +63,7 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
             const result = await response.json()
 
             if (!response.ok) {
-                throw new Error(result.error || result.message || "Failed to update role")
+                throw new Error(result.error || result.message || result.details || "Failed to update role")
             }
 
             // Success

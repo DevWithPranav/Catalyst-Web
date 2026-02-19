@@ -19,7 +19,7 @@ export async function deleteRole(roleId: string): Promise<{
             return {
                 success: false,
                 message: "Failed to delete role",
-                error: data.error || data.details || "Unknown error",
+                error: data.error || data.message || data.details || "Unknown error",
             };
         }
 

@@ -14,7 +14,11 @@ async function getData(): Promise<Payment[]> {
 
     const rawData = await res.json()
 
-    const payments: Payment[] = rawData.map((item: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const list = Array.isArray(rawData) ? rawData : rawData.documents || [];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const payments: Payment[] = list.map((item: any) => {
         const temp_join_date = item.join_date
         const join_Date_ = new Intl.DateTimeFormat("en-CA").format(
             new Date(temp_join_date)
@@ -50,7 +54,8 @@ export async function getRoles(): Promise<Role[]> {
         throw new Error("Failed to fetch roles")
     }
 
-    const data: Role[] = await res.json()
+    const rawData = await res.json()
+    const data = Array.isArray(rawData) ? rawData : rawData.documents || [];
     return data
 }
 
@@ -64,7 +69,8 @@ export async function getOrganizations(): Promise<Organization[]> {
         throw new Error("Failed to fetch organizations")
     }
 
-    const data: Organization[] = await res.json()
+    const rawData = await res.json()
+    const data = Array.isArray(rawData) ? rawData : rawData.documents || [];
     return data
 }
 
