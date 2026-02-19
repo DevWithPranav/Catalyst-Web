@@ -32,29 +32,40 @@ export async function PATCH(
         const { achievement_id } = await params;
         const formData = await request.formData();
 
-        const allowedFields = ["title", "slug", "subtitle", "description", "date"];
+        // Only update fields the form explicitly sends (no slug — generated server-side)
+        const stringFields = ["title", "subtitle", "description"];
         const updateData: Record<string, unknown> = {};
 
-        for (const field of allowedFields) {
+        for (const field of stringFields) {
             const value = formData.get(field);
             if (value !== null) {
-                updateData[field] = (value as string).trim();
+                const trimmed = (value as string).trim();
+                updateData[field] = trimmed === "" ? null : trimmed;
             }
         }
 
+        // Date: send null to clear, or a valid ISO date string
+        const dateValue = formData.get("date");
+        if (dateValue !== null) {
+            const trimmed = (dateValue as string).trim();
+            updateData.date = trimmed === "" ? null : trimmed;
+        }
+
+        // is_featured — only include if the attribute exists in the collection
+        // (add it in Appwrite console as a Boolean attribute named "is_featured" if missing)
         const isFeatured = formData.get("is_featured");
         if (isFeatured !== null) {
-            updateData.is_featured = isFeatured === "true";
+            updateData.Is_featured = isFeatured === "true";
         }
 
         const orgValue = formData.get("org");
         if (orgValue !== null) {
-            updateData.org = orgValue === "" || orgValue === "null" ? null : orgValue;
+            const trimmed = (orgValue as string).trim();
+            updateData.org = trimmed === "" || trimmed === "null" ? null : trimmed;
         }
 
         const errors = validateFields([
-            { field: "title", value: updateData.title, maxLength: 255 },
-            { field: "slug", value: updateData.slug, type: "slug", maxLength: 255 },
+            { field: "title", value: updateData.title, required: true, maxLength: 255 },
             { field: "subtitle", value: updateData.subtitle, maxLength: 255 },
             { field: "description", value: updateData.description, maxLength: 2000 },
             { field: "date", value: updateData.date, type: "date" },
@@ -93,12 +104,32 @@ export async function PATCH(
             return badRequest("No valid update data provided");
         }
 
-        const updatedAchievement = await database.updateDocument(
-            DB_ID,
-            COLLECTIONS.ACHIEVEMENTS,
-            achievement_id,
-            updateData
-        );
+        let updatedAchievement;
+        try {
+            updatedAchievement = await database.updateDocument(
+                DB_ID,
+                COLLECTIONS.ACHIEVEMENTS,
+                achievement_id,
+                updateData
+            );
+        } catch (err: any) {
+            // If Appwrite rejects Is_featured (attribute not yet created in console),
+            // retry without it so the rest of the fields still save.
+            if (
+                typeof err?.message === "string" &&
+                err.message.toLowerCase().includes("is_featured")
+            ) {
+                delete updateData.Is_featured;
+                updatedAchievement = await database.updateDocument(
+                    DB_ID,
+                    COLLECTIONS.ACHIEVEMENTS,
+                    achievement_id,
+                    updateData
+                );
+            } else {
+                throw err;
+            }
+        }
 
         return NextResponse.json({
             message: "Achievement updated successfully",

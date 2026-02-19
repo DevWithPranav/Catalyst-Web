@@ -52,7 +52,7 @@ export function AddRoleForm({ open, onOpenChange, onSuccess }: AddRoleFormProps)
             const result = await response.json()
 
             if (!response.ok) {
-                throw new Error(result.error || result.message || "Failed to create role")
+                throw new Error(result.error || result.message || result.details || "Failed to create role")
             }
 
             // Success

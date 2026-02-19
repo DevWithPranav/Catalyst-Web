@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
         const featured = url.searchParams.get("featured");
         if (featured === "true") {
-            queries.push(Query.equal("is_featured", true));
+            queries.push(Query.equal("Is_featured", true));
         }
 
         const from = url.searchParams.get("from");
@@ -88,9 +88,17 @@ export async function POST(request: Request) {
             subtitle: subtitle ? subtitle.trim() : null,
             description: description ? description.trim() : null,
             date: date || null,
-            is_featured,
             org: org || null,
         };
+
+        // Only include is_featured if the value was explicitly sent
+        // NOTE: The Appwrite collection must have a boolean attribute named "is_featured"
+        // for this to work. Add it in the Appwrite Console if not present.
+        const is_featuredRaw = formData.get("is_featured");
+        if (is_featuredRaw !== null) {
+            payload.Is_featured = is_featuredRaw === "true";
+        }
+
 
         const coverFile = formData.get("cover_image");
         if (coverFile && coverFile instanceof File && coverFile.size > 0) {
@@ -102,12 +110,33 @@ export async function POST(request: Request) {
             payload.related_image = await uploadFile(relatedFile);
         }
 
-        const newAchievement = await database.createDocument(
-            DB_ID,
-            COLLECTIONS.ACHIEVEMENTS,
-            ID.unique(),
-            payload
-        );
+        let newAchievement;
+        try {
+            newAchievement = await database.createDocument(
+                DB_ID,
+                COLLECTIONS.ACHIEVEMENTS,
+                ID.unique(),
+                payload
+            );
+        } catch (createError: any) {
+            // Fallback: if is_featured attribute doesn't exist in the collection yet, retry without it
+            if (
+                createError?.type === "document_invalid_structure" &&
+                typeof createError?.response === "string" &&
+                createError.response.includes("is_featured")
+            ) {
+                const { Is_featured: _omit, ...payloadWithoutFeatured } = payload as any;
+                newAchievement = await database.createDocument(
+                    DB_ID,
+                    COLLECTIONS.ACHIEVEMENTS,
+                    ID.unique(),
+                    payloadWithoutFeatured
+                );
+            } else {
+                throw createError;
+            }
+        }
+
 
         return NextResponse.json(
             { message: "Achievement created successfully", achievement: newAchievement },

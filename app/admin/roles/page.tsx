@@ -11,7 +11,8 @@ async function getRoles(): Promise<Role[]> {
         throw new Error("Failed to fetch roles")
     }
 
-    const data = await res.json()
+    const rawData = await res.json()
+    const data = Array.isArray(rawData) ? rawData : rawData.documents || [];
 
     // Transform the API data to match our Role type
     const roles: Role[] = data.map((role: any) => ({
