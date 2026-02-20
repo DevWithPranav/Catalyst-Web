@@ -196,7 +196,7 @@ export default function AddAchievementForm({
         if (data.cover_image instanceof File) formData.append("cover_image", data.cover_image)
         files.forEach(f => formData.append("related_image", f))
 
-        const res = await fetch("/api/v1/achievements", { method: "POST", body: formData })
+        const res = await fetch("/api/v1/achievements", { method: "POST", credentials: "include", body: formData })
         if (!res.ok) {
             const result = await res.json().catch(() => ({}))
             throw new Error(result.error ?? result.message ?? "Failed to add achievement")
@@ -214,7 +214,7 @@ export default function AddAchievementForm({
         if (data.cover_image instanceof File) formData.append("cover_image", data.cover_image)
         files.forEach(f => formData.append("related_image", f))
 
-        const res = await fetch(`/api/v1/achievements/${achievementId}`, { method: "PATCH", body: formData })
+        const res = await fetch(`/api/v1/achievements/${achievementId}`, { method: "PATCH", credentials: "include", body: formData })
         if (!res.ok) {
             const result = await res.json().catch(() => ({}))
             throw new Error(result.details ?? result.error ?? result.message ?? "Failed to update achievement")

@@ -1,10 +1,16 @@
 "use server"
 
+import { cookies } from "next/headers"
+
 export async function deleteAchievement(id: string): Promise<{ success: boolean; error?: string }> {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/api/v1/achievements/${id}`, {
+        const cookieStore = await cookies()
+        const sessionCookie = cookieStore.get("admin_session")?.value ?? ""
+        const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+        const res = await fetch(`${BASE}/api/v1/achievements/${id}`, {
             method: "DELETE",
             cache: "no-store",
+            headers: { Cookie: `admin_session=${sessionCookie}` },
         })
 
         if (!res.ok) {

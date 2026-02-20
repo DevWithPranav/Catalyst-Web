@@ -1,11 +1,21 @@
+import { cookies } from "next/headers"
 import { columns, Payment } from "./columns"
 import { MembersClient } from "./members-client"
 import { Role, Organization } from "./types"
 
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+
+async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
+    const cookieStore = await cookies()
+    const value = cookieStore.get("admin_session")?.value ?? ""
+    return { Cookie: `admin_session=${value}` }
+}
+
 async function getData(): Promise<Payment[]> {
-    const res = await fetch("http://localhost:3000/api/v1/members", {
+    const res = await fetch(`${BASE}/api/v1/members`, {
         method: "GET",
         cache: "no-store",
+        headers: await getSessionCookieHeader(),
     })
 
     if (!res.ok) {
@@ -45,9 +55,10 @@ async function getData(): Promise<Payment[]> {
 }
 
 export async function getRoles(): Promise<Role[]> {
-    const res = await fetch("http://localhost:3000/api/v1/roles", {
+    const res = await fetch(`${BASE}/api/v1/roles`, {
         method: "GET",
-        cache: "no-store", // always fresh
+        cache: "no-store",
+        headers: await getSessionCookieHeader(),
     })
 
     if (!res.ok) {
@@ -60,9 +71,10 @@ export async function getRoles(): Promise<Role[]> {
 }
 
 export async function getOrganizations(): Promise<Organization[]> {
-    const res = await fetch("http://localhost:3000/api/v1/org", {
+    const res = await fetch(`${BASE}/api/v1/org`, {
         method: "GET",
-        cache: "no-store", // always fresh
+        cache: "no-store",
+        headers: await getSessionCookieHeader(),
     })
 
     if (!res.ok) {

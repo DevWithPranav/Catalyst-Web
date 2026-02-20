@@ -9,8 +9,9 @@ export async function deleteRole(roleId: string): Promise<{
     error?: string;
 }> {
     try {
-        const response = await fetch(`http://localhost:3000/api/v1/roles/${roleId}`, {
+        const response = await fetch(`/api/v1/roles/${roleId}`, {
             method: "DELETE",
+            credentials: "include",
         });
 
         const data = await response.json();

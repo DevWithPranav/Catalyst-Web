@@ -1,13 +1,21 @@
+import { cookies } from "next/headers"
 import { Achievement } from "./columns"
 import { AchievementsClient } from "./achievements-client"
 import { Organization } from "@/app/admin/members/types"
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
+async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
+    const cookieStore = await cookies()
+    const value = cookieStore.get("admin_session")?.value ?? ""
+    return { Cookie: `admin_session=${value}` }
+}
+
 async function getData(): Promise<Achievement[]> {
     const res = await fetch(`${BASE}/api/v1/achievements`, {
         method: "GET",
         cache: "no-store",
+        headers: await getSessionCookieHeader(),
     })
     if (!res.ok) throw new Error("Failed to fetch achievements")
 
@@ -30,6 +38,7 @@ async function getOrganizations(): Promise<Organization[]> {
     const res = await fetch(`${BASE}/api/v1/org`, {
         method: "GET",
         cache: "no-store",
+        headers: await getSessionCookieHeader(),
     })
     if (!res.ok) throw new Error("Failed to fetch organizations")
 

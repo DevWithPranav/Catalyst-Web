@@ -80,6 +80,7 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
 
             const response = await fetch("/api/v1/members", {
                 method: "POST",
+                credentials: "include",
                 body: formData,
             })
 
@@ -159,6 +160,7 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
 
             const response = await fetch(`/api/v1/members/${memberId}`, {
                 method: "PATCH",
+                credentials: "include",
                 body: formData,
             })
 

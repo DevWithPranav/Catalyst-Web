@@ -43,6 +43,7 @@ export function AddRoleForm({ open, onOpenChange, onSuccess }: AddRoleFormProps)
         try {
             const response = await fetch("/api/v1/roles", {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
