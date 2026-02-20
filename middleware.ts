@@ -1,30 +1,43 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
-  const isApiRoute = req.nextUrl.pathname.startsWith("/api/v1");
+const SESSION_COOKIE = "admin_session";
 
-  if (isApiRoute) {
-    // TODO: Replace with real authentication (e.g. session cookie / JWT validation)
-    const authHeader = req.headers.get("authorization");
-    if(process.env.NODE_ENV === "development") {
-      return NextResponse.next();
+/**
+ * Middleware (Edge Runtime):
+ * Only checks whether the session cookie EXISTS.
+ * Actual Appwrite validation happens in the admin layout Server Component
+ * (Node.js runtime, much more reliable for external API calls).
+ */
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  // ── Guard /admin/* ─────────────────────────────────────────────────────────
+  if (pathname.startsWith("/admin")) {
+    const cookie = req.cookies.get(SESSION_COOKIE)?.value;
+    if (!cookie) {
+      return NextResponse.redirect(new URL("/login", req.url));
     }
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  }
+
+  // ── /api/v1/* (not auth routes) ───────────────────────────────────────────
+  // Require session cookie on all non-auth API routes in every environment.
+  if (
+    pathname.startsWith("/api/v1") &&
+    !pathname.startsWith("/api/v1/auth")
+  ) {
+    const cookie = req.cookies.get(SESSION_COOKIE)?.value;
+    if (!cookie) {
       return NextResponse.json(
         { error: "Authentication credentials were not provided" },
         { status: 401 }
       );
     }
-
-    // TODO: Validate the token against your auth provider here
-    // const token = authHeader.split(" ")[1];
-    // const isValid = await validateToken(token);
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/api/v1/:path*"],
+  matcher: ["/admin/:path*", "/api/v1/:path*"],
 };
