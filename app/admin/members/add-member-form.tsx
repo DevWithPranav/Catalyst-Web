@@ -151,7 +151,8 @@ export default function AddMemberForm({
 
             const response = await fetch("/api/v1/members", {
                 method: "POST",
-                body: formData
+                credentials: "include",
+                body: formData,
             })
 
             const result = await response.json()

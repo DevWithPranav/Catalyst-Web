@@ -54,6 +54,7 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
         try {
             const response = await fetch(`/api/v1/roles/${role.id}`, {
                 method: "PATCH",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },

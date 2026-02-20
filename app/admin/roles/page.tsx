@@ -1,10 +1,16 @@
+import { cookies } from "next/headers"
 import { RolesClient } from "./roles-client"
 import { Role } from "./types"
 
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+
 async function getRoles(): Promise<Role[]> {
-    const res = await fetch("http://localhost:3000/api/v1/roles", {
+    const cookieStore = await cookies()
+    const sessionCookie = cookieStore.get("admin_session")?.value ?? ""
+    const res = await fetch(`${BASE}/api/v1/roles`, {
         method: "GET",
         cache: "no-store",
+        headers: { Cookie: `admin_session=${sessionCookie}` },
     })
 
     if (!res.ok) {
