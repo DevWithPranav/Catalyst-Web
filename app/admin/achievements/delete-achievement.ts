@@ -1,12 +1,13 @@
 "use server"
 
 import { cookies } from "next/headers"
+import { getBaseUrl } from "@/lib/get-base-url"
 
 export async function deleteAchievement(id: string): Promise<{ success: boolean; error?: string }> {
     try {
         const cookieStore = await cookies()
         const sessionCookie = cookieStore.get("admin_session")?.value ?? ""
-        const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+        const BASE = getBaseUrl()
         const res = await fetch(`${BASE}/api/v1/achievements/${id}`, {
             method: "DELETE",
             cache: "no-store",

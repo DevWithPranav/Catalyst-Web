@@ -2,8 +2,9 @@ import { cookies } from "next/headers"
 import { Achievement } from "./columns"
 import { AchievementsClient } from "./achievements-client"
 import { Organization } from "@/app/admin/members/types"
+import { getBaseUrl } from "@/lib/get-base-url"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+const BASE = getBaseUrl()
 
 async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
     const cookieStore = await cookies()
