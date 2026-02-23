@@ -1,30 +1,40 @@
-"use client"
-export default function AdminDashboardPage() {
-    return (
-        <div>
-            <h2 className="text-2xl font-bold mb-6 text-gray-900">Dashboard Overview</h2>
+import { cookies } from "next/headers"
+import { EventsClient } from "./events-client"
+import { Event } from "./columns"
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard title="Total Users" value="128" />
-                <StatCard title="Total Events" value="45" />
-                <StatCard title="Active Members" value="89" />
-            </div>
+const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
 
-            <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">Recent Activity</h3>
-                <div className="bg-white rounded-lg shadow p-6">
-                    <p className="text-gray-600">No recent activity to display.</p>
-                </div>
-            </div>
-        </div>
-    );
+async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
+    const cookieStore = await cookies()
+    const value = cookieStore.get("admin_session")?.value ?? ""
+    return { Cookie: `admin_session=${value}` }
 }
 
-function StatCard({ title, value }: { title: string; value: string }) {
-    return (
-        <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-500 mb-1">{title}</p>
-            <p className="text-3xl font-bold text-gray-900">{value}</p>
-        </div>
-    );
+async function getData(): Promise<Event[]> {
+    const res = await fetch(`${BASE}/api/v1/events`, {
+        method: "GET",
+        cache: "no-store",
+        headers: await getSessionCookieHeader(),
+    })
+    if (!res.ok) throw new Error("Failed to fetch events")
+
+    const rawData = await res.json()
+    const list: any[] = Array.isArray(rawData) ? rawData : rawData.documents ?? []
+
+    return list.map((item: any): Event => ({
+        id: item.$id,
+        title: item.title,
+        subtitle: item.subtitle ?? null,
+        cover_image: item.cover_image ?? null,
+        start_date: item.start_date ?? null,
+        end_date: item.end_date ?? null,
+        status: item.status ?? null,
+        register_link: item.register_link ?? null,
+        is_featured: item.is_featured ?? item.Is_featured ?? false,
+    }))
+}
+
+export default async function EventsPage() {
+    const data = await getData()
+    return <EventsClient initialData={data} />
 }

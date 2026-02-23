@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { postActionLog } from "@/lib/utils/action-log"
 import { getColumns, Payment } from "./columns"
 import { DataTable } from "./data-table"
 import AddMemberForm from "./add-member-form"
@@ -91,6 +92,15 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
                 throw new Error(errorMessage)
             }
 
+            // Log success
+            postActionLog({
+                action: "Created Member",
+                entity_type: "member",
+                entity_name: `Created member ${memberData.name}`,
+                status: "success",
+                details: `Name: ${memberData.name} | Email: ${memberData.email} | Phone: ${memberData.phone} | Joined: ${memberData.join_date}`,
+            })
+
             // Success! Reload page after 1 second to show the success message
             setTimeout(() => {
                 window.location.reload()
@@ -98,6 +108,15 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
 
         } catch (error: any) {
             console.error("Error adding member:", error)
+
+            // Log failure
+            postActionLog({
+                action: "Created Member",
+                entity_type: "member",
+                entity_name: `Failed to create member ${memberData.name}`,
+                status: "error",
+                details: error.message ?? "Failed to add member",
+            })
 
             // Show error alert
             setAlert({
@@ -171,6 +190,16 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
                 throw new Error(errorMessage)
             }
 
+            // Log success
+            postActionLog({
+                action: "Updated Member",
+                entity_type: "member",
+                entity_id: memberId,
+                entity_name: `Updated member ${memberData.name}`,
+                status: "success",
+                details: `Name: ${memberData.name} | Email: ${memberData.email} | Phone: ${memberData.phone} | Joined: ${memberData.join_date}`,
+            })
+
             // Success! Reload page after 1 second to show the success message
             setTimeout(() => {
                 window.location.reload()
@@ -178,6 +207,16 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
 
         } catch (error: any) {
             console.error("Error updating member:", error)
+
+            // Log failure
+            postActionLog({
+                action: "Updated Member",
+                entity_type: "member",
+                entity_id: memberId,
+                entity_name: `Failed to update member ${memberData.name}`,
+                status: "error",
+                details: error.message ?? "Failed to update member",
+            })
 
             // Show error alert
             setAlert({
@@ -228,6 +267,11 @@ export function MembersClient({ initialData, roles, organizations }: MembersClie
                             <Button variant="outline"><Plus />Add User</Button>
                         </DrawerTrigger>
                         <DrawerContent className="no-scrollbar overflow-y-auto overflow-x-hidden">
+                            <DrawerHeader className="sr-only">
+                                <DrawerTitle>
+                                    {editingMember ? "Edit Member" : "Add Member"}
+                                </DrawerTitle>
+                            </DrawerHeader>
                             <AddMemberForm
                                 roles={roles}
                                 organizations={organizations}

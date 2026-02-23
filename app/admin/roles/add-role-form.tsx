@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { postActionLog } from "@/lib/utils/action-log"
 import { Button } from "@/components/ui/button"
 import {
     AlertDialog,
@@ -57,6 +58,13 @@ export function AddRoleForm({ open, onOpenChange, onSuccess }: AddRoleFormProps)
             }
 
             // Success
+            postActionLog({
+                action: "Created Role",
+                entity_type: "role",
+                entity_name: `Created role "${roleName}"`,
+                status: "success",
+                details: `Role name: ${roleName}`,
+            })
             if (onSuccess) {
                 onSuccess(roleName)
             }
@@ -66,6 +74,13 @@ export function AddRoleForm({ open, onOpenChange, onSuccess }: AddRoleFormProps)
             setError("")
             onOpenChange(false)
         } catch (err: any) {
+            postActionLog({
+                action: "Created Role",
+                entity_type: "role",
+                entity_name: `Failed to create role "${roleName}"`,
+                status: "error",
+                details: err.message ?? "Failed to create role",
+            })
             setError(err.message || "Failed to create role")
         } finally {
             setIsSubmitting(false)

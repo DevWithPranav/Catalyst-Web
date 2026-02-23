@@ -1,10 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Achievement, getColumns } from "./columns"
+import { Event, getColumns } from "./columns"
 import { DataTable } from "./data-table"
-import AddAchievementForm from "./add-achievement-form"
-import { Organization } from "@/app/admin/members/types"
+import AddEventForm from "./add-event-form"
 import {
     Drawer,
     DrawerContent,
@@ -16,45 +15,42 @@ import { Button } from "@/components/ui/button"
 import { Plus, CheckCircle2, XCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface AchievementsClientProps {
-    initialData: Achievement[]
-    organizations: Organization[]
+interface EventsClientProps {
+    initialData: Event[]
 }
 
-export function AchievementsClient({ initialData, organizations }: AchievementsClientProps) {
-    const [data, setData] = React.useState<Achievement[]>(initialData)
+export function EventsClient({ initialData }: EventsClientProps) {
+    const [data, setData] = React.useState<Event[]>(initialData)
     const [alert, setAlert] = React.useState<{
         type: "success" | "error"
         message: string
     } | null>(null)
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false)
-    const [editingAchievement, setEditingAchievement] = React.useState<Achievement | null>(null)
+    const [editingEvent, setEditingEvent] = React.useState<Event | null>(null)
 
-    const handleEditAchievement = React.useCallback((achievement: Achievement) => {
-        setEditingAchievement(achievement)
+    const handleEditEvent = React.useCallback((event: Event) => {
+        setEditingEvent(event)
         setIsDrawerOpen(true)
     }, [])
 
     const handleDeleteSuccess = React.useCallback((id: string) => {
-        setData((prev) => prev.filter((a) => a.id !== id))
+        setData((prev) => prev.filter((e) => e.id !== id))
     }, [])
 
     const handleAddSuccess = React.useCallback(() => {
         setIsDrawerOpen(false)
-        setAlert({ type: "success", message: "Achievement added successfully!" })
+        setAlert({ type: "success", message: "Event added successfully!" })
         setTimeout(() => window.location.reload(), 1200)
     }, [])
 
     const handleEditSuccess = React.useCallback(() => {
         setIsDrawerOpen(false)
-        setEditingAchievement(null)
-        setAlert({ type: "success", message: "Achievement updated successfully!" })
+        setEditingEvent(null)
+        setAlert({ type: "success", message: "Event updated successfully!" })
         setTimeout(() => window.location.reload(), 1200)
     }, [])
 
-    // Track background POSTs (addMultiple mode)
     const pendingPostsRef = React.useRef<Set<Promise<void>>>(new Set())
-    // True if at least one background POST was started this drawer session
     const hadBackgroundPostRef = React.useRef(false)
 
     const handleBackgroundPost = React.useCallback((promise: Promise<void>) => {
@@ -65,14 +61,12 @@ export function AchievementsClient({ initialData, organizations }: AchievementsC
 
     const handleDrawerOpenChange = React.useCallback(async (open: boolean) => {
         if (open) {
-            // Reset session flag when drawer opens
             hadBackgroundPostRef.current = false
             setIsDrawerOpen(true)
         } else {
             setIsDrawerOpen(false)
-            setEditingAchievement(null)
+            setEditingEvent(null)
             if (hadBackgroundPostRef.current) {
-                // Wait for any still-in-flight POSTs then reload
                 const pending = [...pendingPostsRef.current]
                 if (pending.length > 0) await Promise.allSettled(pending)
                 window.location.reload()
@@ -104,25 +98,24 @@ export function AchievementsClient({ initialData, organizations }: AchievementsC
 
             <div className="flex justify-between items-center w-full">
                 <div>
-                    <h1>Achievements</h1>
+                    <h1>Events</h1>
                 </div>
                 <div>
                     <Drawer direction="right" open={isDrawerOpen} onOpenChange={handleDrawerOpenChange}>
                         <DrawerTrigger asChild>
-                            <Button variant="outline"><Plus />Add Achievement</Button>
+                            <Button variant="outline"><Plus />Add Event</Button>
                         </DrawerTrigger>
                         <DrawerContent className="no-scrollbar overflow-y-auto overflow-x-hidden">
                             <DrawerHeader className="sr-only">
                                 <DrawerTitle>
-                                    {editingAchievement ? "Edit Achievement" : "Add Achievement"}
+                                    {editingEvent ? "Edit Event" : "Add Event"}
                                 </DrawerTitle>
                             </DrawerHeader>
-                            <AddAchievementForm
-                                organizations={organizations}
-                                onSubmitSuccess={editingAchievement ? handleEditSuccess : handleAddSuccess}
-                                onBackgroundPost={editingAchievement ? undefined : handleBackgroundPost}
-                                initialData={editingAchievement ?? undefined}
-                                achievementId={editingAchievement?.id}
+                            <AddEventForm
+                                onSubmitSuccess={editingEvent ? handleEditSuccess : handleAddSuccess}
+                                onBackgroundPost={editingEvent ? undefined : handleBackgroundPost}
+                                initialData={editingEvent ?? undefined}
+                                eventId={editingEvent?.id}
                             />
                         </DrawerContent>
                     </Drawer>
@@ -131,7 +124,7 @@ export function AchievementsClient({ initialData, organizations }: AchievementsC
 
             <div className="py-10 w-full">
                 <DataTable
-                    columns={getColumns(handleEditAchievement, handleDeleteSuccess)}
+                    columns={getColumns(handleEditEvent, handleDeleteSuccess)}
                     data={data}
                 />
             </div>

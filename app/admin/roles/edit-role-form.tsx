@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { postActionLog } from "@/lib/utils/action-log"
 import { Button } from "@/components/ui/button"
 import {
     AlertDialog,
@@ -68,6 +69,14 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
             }
 
             // Success
+            postActionLog({
+                action: "Updated Role",
+                entity_type: "role",
+                entity_id: role.id,
+                entity_name: `Updated role to "${roleName}"`,
+                status: "success",
+                details: `New name: ${roleName}`,
+            })
             if (onSuccess) {
                 onSuccess(roleName)
             }
@@ -77,6 +86,14 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
             setError("")
             onOpenChange(false)
         } catch (err: any) {
+            postActionLog({
+                action: "Updated Role",
+                entity_type: "role",
+                entity_id: role?.id,
+                entity_name: `Failed to update role "${roleName}"`,
+                status: "error",
+                details: err.message ?? "Failed to update role",
+            })
             setError(err.message || "Failed to update role")
         } finally {
             setIsSubmitting(false)
