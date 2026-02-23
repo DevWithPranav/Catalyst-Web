@@ -63,7 +63,7 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
 
         const results = await Promise.allSettled(
             selectedRows.map((row) =>
-                fetch(`/api/v1/achievements/${row.original.id}`, {
+                fetch(`/api/v1/events/${row.original.id}`, {
                     method: "DELETE",
                     credentials: "include",
                 })
@@ -82,10 +82,10 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
             .join(" | ")
 
         postActionLog({
-            action: "Deleted Achievements (Bulk)",
-            entity_type: "achievement",
+            action: "Deleted Events (Bulk)",
+            entity_type: "event",
             entity_name: failed.length === 0
-                ? `Bulk deleted ${succeeded.length} achievement(s)`
+                ? `Bulk deleted ${succeeded.length} event(s)`
                 : `Bulk delete: ${succeeded.length} succeeded, ${failed.length} failed`,
             status: failed.length === 0 ? "success" : "error",
             details,
@@ -94,14 +94,14 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
         setIsDeleteDialogOpen(false)
 
         if (failed.length === 0) {
-            setAlert({ type: "success", message: `Successfully deleted ${succeeded.length} achievement(s).` })
+            setAlert({ type: "success", message: `Successfully deleted ${succeeded.length} event(s).` })
             setTimeout(() => window.location.reload(), 1500)
         } else if (succeeded.length === 0) {
-            setAlert({ type: "error", message: `Failed to delete all ${failed.length} achievement(s). Please try again.` })
+            setAlert({ type: "error", message: `Failed to delete all ${failed.length} event(s). Please try again.` })
             setIsDeleting(false)
             setTimeout(() => setAlert(null), 5000)
         } else {
-            setAlert({ type: "error", message: `Deleted ${succeeded.length} achievement(s), but ${failed.length} failed.` })
+            setAlert({ type: "error", message: `Deleted ${succeeded.length} event(s), but ${failed.length} failed.` })
             setTimeout(() => window.location.reload(), 2000)
         }
     }
@@ -169,7 +169,7 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    No events found.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -180,9 +180,9 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete {selectedCount} achievement(s)?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete {selectedCount} event(s)?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete {selectedCount} selected achievement(s)? This action cannot be undone.
+                            Are you sure you want to delete {selectedCount} selected event(s)? This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

@@ -1,4 +1,4 @@
-import { Calendar, Home, Users, Shield, Trophy } from "lucide-react"
+import { Calendar, Home, Users, Shield, Trophy, ScrollText } from "lucide-react"
 
 import {
   Sidebar,
@@ -37,6 +37,11 @@ const items = [
     title: "Achievements",
     url: "/admin/achievements",
     icon: Trophy,
+  },
+  {
+    title: "Logs",
+    url: "/admin/logs",
+    icon: ScrollText,
   },
 ]
 

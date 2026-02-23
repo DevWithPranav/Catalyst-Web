@@ -47,6 +47,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { postActionLog } from "@/lib/utils/action-log"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -215,6 +216,14 @@ export function getColumns(onEditClick?: (member: Payment) => void): ColumnDef<P
           const result = await deleteMember(payment.id)
 
           if (result.success) {
+            postActionLog({
+              action: "Deleted Member",
+              entity_type: "member",
+              entity_id: payment.id,
+              entity_name: `Deleted member ${payment.name}`,
+              status: "success",
+              details: `Name: ${payment.name} | Email: ${payment.email} | Roles: ${payment.roles}`,
+            })
             setAlert({
               type: "success",
               message: "Member deleted successfully"
@@ -223,6 +232,14 @@ export function getColumns(onEditClick?: (member: Payment) => void): ColumnDef<P
               window.location.reload()
             }, 1500)
           } else {
+            postActionLog({
+              action: "Deleted Member",
+              entity_type: "member",
+              entity_id: payment.id,
+              entity_name: `Failed to delete member ${payment.name}`,
+              status: "error",
+              details: result.error ?? "Delete failed",
+            })
             setAlert({
               type: "error",
               message: `Failed to delete member: ${result.error}`

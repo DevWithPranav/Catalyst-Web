@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { postActionLog } from "@/lib/utils/action-log"
 import {
     Avatar,
     AvatarFallback,
@@ -23,23 +24,57 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { postActionLog } from "@/lib/utils/action-log"
 
-export type Achievement = {
+export type Event = {
     id: string
     title: string
     subtitle: string | null
     cover_image: string | null
-    related_image: string | string[] | null
+    start_date: string | null
+    end_date: string | null
+    status: string | null
+    register_link: string | null
     is_featured: boolean
-    date: string | null
-    last_updated: string
+}
+
+function StatusBadge({ status }: { status: string | null }) {
+    if (!status) return <span className="text-muted-foreground text-sm">—</span>
+
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+        upcoming: "secondary",
+        ongoing: "default",
+        completed: "outline",
+        cancelled: "destructive",
+    }
+
+    const labels: Record<string, string> = {
+        upcoming: "Upcoming",
+        ongoing: "Ongoing",
+        completed: "Completed",
+        cancelled: "Cancelled",
+    }
+
+    const key = status.toLowerCase()
+    return (
+        <Badge variant={variants[key] ?? "secondary"}>
+            {labels[key] ?? status}
+        </Badge>
+    )
+}
+
+function formatDate(date: string | null) {
+    if (!date) return <span className="text-muted-foreground text-sm">—</span>
+    return (
+        <span className="text-sm">
+            {new Intl.DateTimeFormat("en-CA").format(new Date(date))}
+        </span>
+    )
 }
 
 export function getColumns(
-    onEditClick?: (achievement: Achievement) => void,
+    onEditClick?: (event: Event) => void,
     onDeleteSuccess?: (id: string) => void,
-): ColumnDef<Achievement>[] {
+): ColumnDef<Event>[] {
     return [
         {
             id: "select",
@@ -78,11 +113,11 @@ export function getColumns(
             accessorKey: "cover_image",
             header: "",
             cell: ({ row }) => {
-                const achievement = row.original
+                const event = row.original
                 return (
                     <Avatar size="sm">
-                        <AvatarImage src={achievement.cover_image ?? ""} />
-                        <AvatarFallback>{achievement.title.charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={event.cover_image ?? ""} />
+                        <AvatarFallback>{event.title.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                 )
             },
@@ -103,42 +138,25 @@ export function getColumns(
             },
         },
         {
-            accessorKey: "is_featured",
-            header: "Featured",
-            cell: ({ row }) => {
-                const featured = row.getValue("is_featured") as boolean
-                return (
-                    <Badge variant={featured ? "default" : "secondary"}>
-                        {featured ? "Featured" : "Not Featured"}
-                    </Badge>
-                )
-            },
+            accessorKey: "start_date",
+            header: "Start Date",
+            cell: ({ row }) => formatDate(row.getValue("start_date")),
         },
         {
-            accessorKey: "date",
-            header: "Date",
-            cell: ({ row }) => {
-                const date = row.getValue("date") as string | null
-                if (!date) return <span className="text-muted-foreground text-sm">—</span>
-                return (
-                    <span className="text-sm">
-                        {new Intl.DateTimeFormat("en-CA").format(new Date(date))}
-                    </span>
-                )
-            },
+            accessorKey: "end_date",
+            header: "End Date",
+            cell: ({ row }) => formatDate(row.getValue("end_date")),
         },
         {
-            accessorKey: "last_updated",
-            header: "Last Updated",
-            cell: ({ row }) => (
-                <span className="text-muted-foreground text-sm">{row.getValue("last_updated")}</span>
-            ),
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
         },
         {
             id: "actions",
             header: "",
             cell: ({ row }) => {
-                const achievement = row.original
+                const event = row.original
                 const [isDeleting, setIsDeleting] = useState(false)
                 const [alert, setAlert] = useState<{
                     type: "success" | "error"
@@ -147,31 +165,30 @@ export function getColumns(
 
                 const handleDelete = async () => {
                     setIsDeleting(true)
-                    const { deleteAchievement } = await import("@/app/admin/achievements/delete-achievement")
-                    const result = await deleteAchievement(achievement.id)
-
-                    if (result.success) {
+                    try {
+                        const res = await fetch(`/api/v1/events/${event.id}`, { method: "DELETE", credentials: "include" })
+                        if (!res.ok) throw new Error("Delete failed")
                         postActionLog({
-                            action: "Deleted Achievement",
-                            entity_type: "achievement",
-                            entity_id: achievement.id,
-                            entity_name: `Deleted achievement "${achievement.title}"`,
+                            action: "Deleted Event",
+                            entity_type: "event",
+                            entity_id: event.id,
+                            entity_name: `Deleted event "${event.title}"`,
                             status: "success",
-                            details: `Title: ${achievement.title}${achievement.subtitle ? ` | Subtitle: ${achievement.subtitle}` : ""}`,
+                            details: `Title: ${event.title}${event.subtitle ? ` | Subtitle: ${event.subtitle}` : ""}${event.status ? ` | Status: ${event.status}` : ""}`,
                         })
-                        setAlert({ type: "success", message: "Achievement deleted successfully" })
-                        onDeleteSuccess?.(achievement.id)
+                        setAlert({ type: "success", message: "Event deleted successfully" })
+                        onDeleteSuccess?.(event.id)
                         setTimeout(() => window.location.reload(), 1500)
-                    } else {
+                    } catch (err: any) {
                         postActionLog({
-                            action: "Deleted Achievement",
-                            entity_type: "achievement",
-                            entity_id: achievement.id,
-                            entity_name: `Failed to delete achievement "${achievement.title}"`,
+                            action: "Deleted Event",
+                            entity_type: "event",
+                            entity_id: event.id,
+                            entity_name: `Failed to delete event "${event.title}"`,
                             status: "error",
-                            details: result.error ?? "Delete failed",
+                            details: err.message ?? "Delete failed",
                         })
-                        setAlert({ type: "error", message: `Failed to delete: ${result.error}` })
+                        setAlert({ type: "error", message: "Failed to delete event" })
                         setIsDeleting(false)
                         setTimeout(() => setAlert(null), 5000)
                     }
@@ -200,7 +217,7 @@ export function getColumns(
                             <Button
                                 variant="outline"
                                 size="icon"
-                                onClick={() => onEditClick?.(achievement)}
+                                onClick={() => onEditClick?.(event)}
                             >
                                 <Pencil className="h-4 w-4" />
                             </Button>
@@ -213,9 +230,9 @@ export function getColumns(
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete Achievement</AlertDialogTitle>
+                                        <AlertDialogTitle>Delete Event</AlertDialogTitle>
                                         <AlertDialogDescription>
-                                            Are you sure you want to delete &quot;{achievement.title}&quot;? This action cannot be undone.
+                                            Are you sure you want to delete &quot;{event.title}&quot;? This action cannot be undone.
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>

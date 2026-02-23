@@ -9,6 +9,7 @@ import {
 } from "@/lib/utils/api-response";
 import { parsePagination, paginationQueries } from "@/lib/utils/pagination";
 import { sendDiscordWebhook } from "@/lib/utils/discord";
+import { getCurrentUser } from "@/lib/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -104,7 +105,11 @@ export async function POST(request: Request) {
             return badRequest("Invalid JSON body");
         }
 
-        const { action, entity_type, entity_id, entity_name, performed_by, details, status } = body;
+        const { action, entity_type, entity_id, entity_name, details, status } = body;
+
+        // ── Resolve current user (server-side, never from client body) ──────────
+        const currentUser = await getCurrentUser();
+        const performed_by = currentUser?.name ?? body.performed_by ?? undefined;
 
         // ── Validation ─────────────────────────────────────────────────────────
         if (!action || typeof action !== "string" || action.trim().length === 0) {

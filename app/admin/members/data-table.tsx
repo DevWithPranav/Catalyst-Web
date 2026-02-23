@@ -36,6 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { postActionLog } from "@/lib/utils/action-log"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -71,37 +72,61 @@ export function DataTable<TData, TValue>({
     setIsDeleting(true)
     const { deleteMember } = await import("@/app/admin/members/delete-member")
 
-    // Delete all selected members
-    const deletePromises = selectedRows.map((row) => {
+    // Snapshot member data before deletion
+    const memberSnapshots = selectedRows.map((row) => {
       const rowData = row.original as any
-      return deleteMember(rowData.id || rowData.$id)
+      return { id: rowData.id || rowData.$id, name: rowData.name, email: rowData.email, roles: rowData.roles }
     })
+
+    // Delete all selected members
+    const deletePromises = memberSnapshots.map((m) => deleteMember(m.id))
 
     try {
       const results = await Promise.all(deletePromises)
-      const failed = results.filter(r => !r.success)
+      const failedIndices = results.map((r, i) => (!r.success ? i : -1)).filter(i => i !== -1)
+      const succeededSnapshots = memberSnapshots.filter((_, i) => results[i].success)
+      const failedSnapshots = memberSnapshots.filter((_, i) => !results[i].success)
 
-      if (failed.length > 0) {
+      // Single consolidated log entry
+      const allSucceeded = failedIndices.length === 0
+      const details = memberSnapshots
+        .map((m, i) => `${results[i].success ? "✓" : "✗"} ${m.name} (${m.email})${m.roles ? ` — ${m.roles}` : ""}`)
+        .join(" | ")
+
+      postActionLog({
+        action: "Deleted Members (Bulk)",
+        entity_type: "member",
+        entity_name: allSucceeded
+          ? `Bulk deleted ${succeededSnapshots.length} member(s): ${succeededSnapshots.map(m => m.name).join(", ")}`
+          : `Bulk delete: ${succeededSnapshots.length} succeeded, ${failedSnapshots.length} failed`,
+        status: allSucceeded ? "success" : failedSnapshots.length === memberSnapshots.length ? "error" : "error",
+        details,
+      })
+
+      if (failedSnapshots.length > 0) {
         setAlert({
           type: "error",
-          message: `Failed to delete ${failed.length} of ${selectedCount} member(s)`
+          message: `Failed to delete ${failedSnapshots.length} of ${selectedCount} member(s). Deleted: ${succeededSnapshots.map(m => m.name).join(", ")}`
         })
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
+        setTimeout(() => { window.location.reload() }, 2000)
       } else {
         setAlert({
           type: "success",
-          message: `Successfully deleted ${selectedCount} member(s)`
+          message: `Successfully deleted ${selectedCount} member(s): ${memberSnapshots.map(m => m.name).join(", ")}`
         })
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500)
+        setTimeout(() => { window.location.reload() }, 1500)
       }
 
       setIsDeleteDialogOpen(false)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Delete error:", error)
+      postActionLog({
+        action: "Deleted Members (Bulk)",
+        entity_type: "member",
+        entity_name: `Bulk delete failed for ${memberSnapshots.length} member(s)`,
+        status: "error",
+        details: `Members: ${memberSnapshots.map(m => m.name).join(", ")} | Error: ${error?.message ?? "Unexpected error"}`,
+      })
       setAlert({
         type: "error",
         message: "An error occurred while deleting members"

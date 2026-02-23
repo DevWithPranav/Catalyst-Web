@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { postActionLog } from "@/lib/utils/action-log"
 import { createPortal } from "react-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
@@ -221,16 +222,40 @@ export default function AddAchievementForm({
         }
     }
 
+    function buildAchievementDetails(data: FormValues) {
+        return [
+            `Title: ${data.title}`,
+            data.subtitle ? `Subtitle: ${data.subtitle}` : null,
+            data.date ? `Date: ${data.date}` : null,
+            data.is_featured !== undefined ? `Featured: ${data.is_featured ? "Yes" : "No"}` : null,
+            data.org ? `Organization: ${data.org}` : null,
+        ].filter(Boolean).join(" | ")
+    }
+
     async function onSubmit(data: FormValues) {
         if (isEditMode) {
             setIsSubmitting(true)
             try {
                 await patchAchievement(data, relatedFiles)
+                postActionLog({
+                    action: "Updated Achievement",
+                    entity_type: "achievement",
+                    entity_name: `Updated achievement "${data.title}"`,
+                    status: "success",
+                    details: buildAchievementDetails(data),
+                })
                 setIsLocked(true)
                 onSubmitSuccess?.()
             } catch (err: any) {
                 console.error("Error updating achievement:", err)
-                alert(`Error: ${err.message}`)
+                postActionLog({
+                    action: "Updated Achievement",
+                    entity_type: "achievement",
+                    entity_name: `Failed to update achievement "${data.title}"`,
+                    status: "error",
+                    details: err.message ?? "Failed to update achievement",
+                })
+                pushAlert("error", err.message ?? "Failed to update achievement")
             } finally {
                 setIsSubmitting(false)
             }
@@ -249,18 +274,50 @@ export default function AddAchievementForm({
                 { ...dataSnapshot, cover_image: coverSnapshot },
                 fileSnapshot
             )
-                .then(() => pushAlert("success", `"${dataSnapshot.title}" added successfully`))
-                .catch(err => pushAlert("error", err.message ?? "Failed to add achievement"))
+                .then(() => {
+                    postActionLog({
+                        action: "Created Achievement",
+                        entity_type: "achievement",
+                        entity_name: `Created achievement "${dataSnapshot.title}"`,
+                        status: "success",
+                        details: buildAchievementDetails(dataSnapshot),
+                    })
+                    pushAlert("success", `"${dataSnapshot.title}" added successfully`)
+                })
+                .catch(err => {
+                    postActionLog({
+                        action: "Created Achievement",
+                        entity_type: "achievement",
+                        entity_name: `Failed to create achievement "${dataSnapshot.title}"`,
+                        status: "error",
+                        details: err.message ?? "Failed to add achievement",
+                    })
+                    pushAlert("error", err.message ?? "Failed to add achievement")
+                })
             onBackgroundPost?.(promise)
         } else {
             setIsSubmitting(true)
             try {
                 await postAchievement(data, relatedFiles)
+                postActionLog({
+                    action: "Created Achievement",
+                    entity_type: "achievement",
+                    entity_name: `Created achievement "${data.title}"`,
+                    status: "success",
+                    details: buildAchievementDetails(data),
+                })
                 resetFormState()
                 onSubmitSuccess?.()
             } catch (err: any) {
                 console.error("Error adding achievement:", err)
-                alert(`Error: ${err.message}`)
+                postActionLog({
+                    action: "Created Achievement",
+                    entity_type: "achievement",
+                    entity_name: `Failed to create achievement "${data.title}"`,
+                    status: "error",
+                    details: err.message ?? "Failed to add achievement",
+                })
+                pushAlert("error", err.message ?? "Failed to add achievement")
             } finally {
                 setIsSubmitting(false)
             }
