@@ -1,8 +1,9 @@
 import { cookies } from "next/headers"
 import { RolesClient } from "./roles-client"
 import { Role } from "./types"
+import { getBaseUrl } from "@/lib/get-base-url"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+const BASE = getBaseUrl()
 
 async function getRoles(): Promise<Role[]> {
     const cookieStore = await cookies()
