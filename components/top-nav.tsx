@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export function TopNav({ user }: { user: any }) {
   return (
-    <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b bg-background/95 backdrop-blur-md px-4 pr-6">
+    <header data-topnav className="flex h-16 w-full items-center justify-between border-b bg-background px-4 pr-6 shrink-0">
       {/* Left controls - Always visible Hamburger */}
       <div className="flex items-center gap-4">
         <SidebarTrigger className="text-muted-foreground hover:text-foreground" />

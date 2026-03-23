@@ -1,46 +1,25 @@
-import { cookies } from "next/headers"
 import { columns, Payment } from "./columns"
 import { MembersClient } from "./members-client"
 import { Role, Organization } from "./types"
-import { getBaseUrl } from "@/lib/get-base-url"
+import { adminFetch, CACHE_TAGS } from "@/lib/admin-fetcher"
 
-const BASE = getBaseUrl()
-
-async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
-    const cookieStore = await cookies()
-    const value = cookieStore.get("admin_session")?.value ?? ""
-    return { Cookie: `admin_session=${value}` }
-}
+// ISR: revalidate this page every 60 seconds
+export const revalidate = 60
 
 async function getData(): Promise<Payment[]> {
-    const res = await fetch(`${BASE}/api/v1/members`, {
-        method: "GET",
-        cache: "no-store",
-        headers: await getSessionCookieHeader(),
+    const rawData = await adminFetch<any>("/api/v1/members", {
+        tags: [CACHE_TAGS.members],
+        revalidate: 60,
     })
 
-    if (!res.ok) {
-        throw new Error("Failed to fetch members")
-    }
+    const list = Array.isArray(rawData) ? rawData : rawData.documents || []
 
-    const rawData = await res.json()
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const list = Array.isArray(rawData) ? rawData : rawData.documents || [];
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payments: Payment[] = list.map((item: any) => {
-        const temp_join_date = item.join_date
-        const join_Date_ = new Intl.DateTimeFormat("en-CA").format(
-            new Date(temp_join_date)
-        )
-        const temp_leave_date = item.leave_date
-        const leave_Date_ = new Intl.DateTimeFormat("en-CA").format(
-            new Date(temp_leave_date)
-        )
+    return list.map((item: any): Payment => {
+        const join_Date_ = new Intl.DateTimeFormat("en-CA").format(new Date(item.join_date))
+        const leave_Date_ = new Intl.DateTimeFormat("en-CA").format(new Date(item.leave_date))
 
         return {
-            id: item.$id,  // Add the ID from the API
+            id: item.$id,
             name: item.name,
             phone: item.phone,
             photo: item.photo,
@@ -51,46 +30,33 @@ async function getData(): Promise<Payment[]> {
             leave_date: leave_Date_,
         }
     })
-
-    return payments
 }
 
-export async function getRoles(): Promise<Role[]> {
-    const res = await fetch(`${BASE}/api/v1/roles`, {
-        method: "GET",
-        cache: "no-store",
-        headers: await getSessionCookieHeader(),
+async function getRoles(): Promise<Role[]> {
+    const rawData = await adminFetch<any>("/api/v1/roles", {
+        tags: [CACHE_TAGS.roles],
+        revalidate: 300, // 5 minutes — roles change infrequently
     })
-
-    if (!res.ok) {
-        throw new Error("Failed to fetch roles")
-    }
-
-    const rawData = await res.json()
-    const data = Array.isArray(rawData) ? rawData : rawData.documents || [];
+    const data = Array.isArray(rawData) ? rawData : rawData.documents || []
     return data
 }
 
-export async function getOrganizations(): Promise<Organization[]> {
-    const res = await fetch(`${BASE}/api/v1/org`, {
-        method: "GET",
-        cache: "no-store",
-        headers: await getSessionCookieHeader(),
+async function getOrganizations(): Promise<Organization[]> {
+    const rawData = await adminFetch<any>("/api/v1/org", {
+        tags: [CACHE_TAGS.organizations],
+        revalidate: 300, // 5 minutes
     })
-
-    if (!res.ok) {
-        throw new Error("Failed to fetch organizations")
-    }
-
-    const rawData = await res.json()
-    const data = Array.isArray(rawData) ? rawData : rawData.documents || [];
+    const data = Array.isArray(rawData) ? rawData : rawData.documents || []
     return data
 }
 
 export default async function DemoPage() {
-    const data = await getData()
-    const roles = await getRoles()
-    const organizations = await getOrganizations()
+    // Fetch all resources in parallel (was sequential before!)
+    const [data, roles, organizations] = await Promise.all([
+        getData(),
+        getRoles(),
+        getOrganizations(),
+    ])
 
     return (
         <MembersClient

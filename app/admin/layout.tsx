@@ -35,7 +35,7 @@ export default async function Layout({
           <div className="flex flex-col flex-1 min-h-screen overflow-hidden bg-background text-foreground relative">
             <TopNav user={user} />
 
-            <main className="flex-1 p-6 md:p-8 w-full md:mt-16">{children}</main>
+            <main className="flex-1 p-6 md:p-8 w-full">{children}</main>
           </div>
         </SidebarProvider>
       </div>

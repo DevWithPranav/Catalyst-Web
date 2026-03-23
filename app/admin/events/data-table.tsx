@@ -213,7 +213,7 @@ export function DataTable<TData extends {
                                 <div className="rounded-lg bg-muted/30 p-3 mb-4 grid grid-cols-2 gap-y-3">
                                     <div className="col-span-2 flex items-center gap-2 text-xs text-muted-foreground">
                                         <Calendar className="w-3.5 h-3.5" />
-                                        <span>{event.start_date ? new Date(event.start_date).toLocaleDateString() : 'N/A'}</span>
+                                        <span>{event.start_date ? new Date(event.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}</span>
                                     </div>
                                 </div>
 

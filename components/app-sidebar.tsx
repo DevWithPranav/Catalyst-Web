@@ -150,7 +150,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       {/* ── Header ─────────────────────────────────────────────── */}
-      <SidebarHeader className="py-4 px-4 border-b">
+      <SidebarHeader className="border-b">
         <div className="flex items-center gap-3">
           {/* Logo mark */}
           <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">

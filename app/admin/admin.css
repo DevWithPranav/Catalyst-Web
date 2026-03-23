@@ -67,3 +67,18 @@
     --sidebar-ring: oklch(0.439 0 0);
   }
 }
+
+/* ─── Layout alignment: keep sidebar header and top-nav exactly the same height ─── */
+/* Using CSS instead of Tailwind class overrides avoids cn()/tailwind-merge
+   reordering classes differently on the server vs client (SSR hydration mismatch). */
+.admin-theme [data-sidebar="header"] {
+  height: 4rem;          /* h-16 = 64px */
+  padding: 0 1rem;       /* px-4 */
+  display: flex;
+  align-items: center;
+}
+
+.admin-theme header[data-topnav] {
+  height: 4rem;          /* h-16 = 64px */
+  flex-shrink: 0;
+}

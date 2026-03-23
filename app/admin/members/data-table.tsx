@@ -261,7 +261,7 @@ export function DataTable<TData extends Payment, TValue>({
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Calendar className="w-3.5 h-3.5" />
-                    <span>{payment.join_date ? new Date(payment.join_date).toLocaleDateString() : 'N/A'}</span>
+                    <span>{payment.join_date ? new Date(payment.join_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-foreground font-medium justify-self-end">
                     <Activity className="w-3.5 h-3.5 text-muted-foreground" />
