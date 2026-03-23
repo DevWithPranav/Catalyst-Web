@@ -3,7 +3,7 @@
 import * as React from "react"
 import { ActionLog } from "./columns"
 import { DataTable } from "./data-table"
-import { ScrollText, RefreshCw, CheckCircle2, XCircle } from "lucide-react"
+import { ScrollText, RefreshCw, CheckCircle2, XCircle, Download, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface LogsClientProps {
@@ -77,25 +77,32 @@ export function LogsClient({ initialData, total }: LogsClientProps) {
 
     return (
         <div className="flex flex-col items-center w-full max-w-7xl mx-auto gap-6">
-            {/* Header */}
-            <div className="flex justify-between items-center w-full">
-                <div className="flex items-center gap-2">
-                    <ScrollText className="h-5 w-5 text-muted-foreground" />
-                    <h1 className="text-xl font-semibold">Action Logs</h1>
-                    <span className="text-sm text-muted-foreground ml-1">
-                        ({totalCount} total)
-                    </span>
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 w-full">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                        <ScrollText className="h-6 w-6 text-muted-foreground hidden sm:block" />
+                        Action Logs
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Monitor system activity and administrative actions. <span className="hidden sm:inline">({totalCount} total)</span>
+                    </p>
                 </div>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => fetchLogs(page, statusFilter, entityFilter)}
-                    disabled={isRefreshing}
-                    className="gap-1.5"
-                >
-                    <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-                    Refresh
-                </Button>
+                
+                <div className="flex w-full md:w-auto flex-col sm:flex-row shadow-sm sm:shadow-none gap-2">
+                    <Button variant="outline" className="w-full sm:w-auto h-10 shadow-sm order-2 sm:order-1">
+                        <Download className="w-4 h-4 mr-2" /> Export
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={() => fetchLogs(page, statusFilter, entityFilter)}
+                        disabled={isRefreshing}
+                        className="w-full sm:w-auto h-10 shadow-sm order-1 sm:order-2"
+                    >
+                        <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+                        Refresh
+                    </Button>
+                </div>
             </div>
 
             {/* Summary cards */}
@@ -166,27 +173,43 @@ export function LogsClient({ initialData, total }: LogsClientProps) {
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page <= 1 || isRefreshing}
-                        onClick={() => setPage(p => p - 1)}
-                    >
-                        Previous
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                        Page {page} of {totalPages}
-                    </span>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={page >= totalPages || isRefreshing}
-                        onClick={() => setPage(p => p + 1)}
-                    >
-                        Next
-                    </Button>
+            {totalCount > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t pt-4 w-full">
+                    <div className="text-sm text-muted-foreground sm:text-left text-center w-full sm:w-auto">
+                        Showing <span className="font-semibold text-foreground">{(page - 1) * limit + 1}</span> to <span className="font-semibold text-foreground">{Math.min(page * limit, totalCount)}</span> of <span className="font-semibold text-foreground">{totalCount}</span> results
+                    </div>
+                    {totalPages > 1 && (
+                        <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                            <div className="flex items-center gap-1 sm:hidden text-sm font-medium text-muted-foreground mx-auto mb-2">
+                                Page <span className="text-foreground">{page}</span> of {totalPages}
+                            </div>
+                            <div className="flex items-center gap-2 justify-between w-full sm:w-auto">
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-8 md:px-3" 
+                                    disabled={page <= 1 || isRefreshing}
+                                    onClick={() => setPage(p => p - 1)}
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </Button>
+                                <div className="hidden sm:flex items-center gap-1">
+                                    <span className="text-sm text-muted-foreground mx-2">
+                                        Page <span className="font-medium text-foreground">{page}</span> of {totalPages}
+                                    </span>
+                                </div>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-8 md:px-3"
+                                    disabled={page >= totalPages || isRefreshing}
+                                    onClick={() => setPage(p => p + 1)}
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

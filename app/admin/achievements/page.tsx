@@ -1,26 +1,17 @@
-import { cookies } from "next/headers"
 import { Achievement } from "./columns"
 import { AchievementsClient } from "./achievements-client"
 import { Organization } from "@/app/admin/members/types"
-import { getBaseUrl } from "@/lib/get-base-url"
+import { adminFetch, CACHE_TAGS } from "@/lib/admin-fetcher"
 
-const BASE = getBaseUrl()
-
-async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
-    const cookieStore = await cookies()
-    const value = cookieStore.get("admin_session")?.value ?? ""
-    return { Cookie: `admin_session=${value}` }
-}
+// ISR: revalidate every 60 seconds
+export const revalidate = 60
 
 async function getData(): Promise<Achievement[]> {
-    const res = await fetch(`${BASE}/api/v1/achievements`, {
-        method: "GET",
-        cache: "no-store",
-        headers: await getSessionCookieHeader(),
+    const rawData = await adminFetch<any>("/api/v1/achievements", {
+        tags: [CACHE_TAGS.achievements],
+        revalidate: 60,
     })
-    if (!res.ok) throw new Error("Failed to fetch achievements")
 
-    const rawData = await res.json()
     const list: any[] = Array.isArray(rawData) ? rawData : rawData.documents ?? []
 
     return list.map((item: any): Achievement => ({
@@ -36,14 +27,10 @@ async function getData(): Promise<Achievement[]> {
 }
 
 async function getOrganizations(): Promise<Organization[]> {
-    const res = await fetch(`${BASE}/api/v1/org`, {
-        method: "GET",
-        cache: "no-store",
-        headers: await getSessionCookieHeader(),
+    const rawData = await adminFetch<any>("/api/v1/org", {
+        tags: [CACHE_TAGS.organizations],
+        revalidate: 300, // 5 minutes
     })
-    if (!res.ok) throw new Error("Failed to fetch organizations")
-
-    const rawData = await res.json()
     return Array.isArray(rawData) ? rawData : rawData.documents ?? []
 }
 

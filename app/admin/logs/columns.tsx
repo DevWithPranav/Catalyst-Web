@@ -70,12 +70,9 @@ export function getColumns(
         },
         {
             accessorKey: "entity_name",
-            header: "Description",
-            cell: ({ row }) => (
-                <span className="text-sm">
-                    {row.original.entity_name ?? <span className="text-muted-foreground">—</span>}
-                </span>
-            ),
+            header: "",
+            cell: () => null,
+            enableHiding: true,
         },
         {
             accessorKey: "performed_by",

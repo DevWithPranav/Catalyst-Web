@@ -1,24 +1,16 @@
-import { cookies } from "next/headers"
 import { EventsClient } from "./events-client"
 import { Event } from "./columns"
+import { adminFetch, CACHE_TAGS } from "@/lib/admin-fetcher"
 
-const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-
-async function getSessionCookieHeader(): Promise<{ Cookie: string }> {
-    const cookieStore = await cookies()
-    const value = cookieStore.get("admin_session")?.value ?? ""
-    return { Cookie: `admin_session=${value}` }
-}
+// ISR: revalidate every 60 seconds
+export const revalidate = 60
 
 async function getData(): Promise<Event[]> {
-    const res = await fetch(`${BASE}/api/v1/events`, {
-        method: "GET",
-        cache: "no-store",
-        headers: await getSessionCookieHeader(),
+    const rawData = await adminFetch<any>("/api/v1/events", {
+        tags: [CACHE_TAGS.events],
+        revalidate: 60,
     })
-    if (!res.ok) throw new Error("Failed to fetch events")
 
-    const rawData = await res.json()
     const list: any[] = Array.isArray(rawData) ? rawData : rawData.documents ?? []
 
     return list.map((item: any): Event => ({
