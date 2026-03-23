@@ -16,8 +16,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { Trash2, CheckCircle2, XCircle } from "lucide-react"
+import { Trash2, CheckCircle2, XCircle, ChevronLeft, ChevronRight, Calendar, Flag, Pencil } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,7 +38,9 @@ interface DataTableProps<TData, TValue> {
     data: TData[]
 }
 
-export function DataTable<TData extends { id: string; title?: string }, TValue>({
+export function DataTable<TData extends { 
+    id: string; title?: string; subtitle?: string | null; cover_image?: string | null; start_date?: string | null; status?: string | null 
+}, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
@@ -126,8 +131,8 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
             )}
 
             {selectedCount > 0 && (
-                <div className="flex items-center justify-between rounded-md border bg-muted/50 p-3">
-                    <span className="text-sm text-muted-foreground">
+                <div className="flex items-center justify-between bg-destructive/10 border-b border-destructive/20 px-6 py-3 rounded-t-lg">
+                    <span className="text-sm font-medium text-destructive">
                         {selectedCount} row(s) selected
                     </span>
                     <button
@@ -140,13 +145,14 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
                 </div>
             )}
 
-            <div className="overflow-hidden rounded-md border">
-                <Table>
-                    <TableHeader>
+            {/* Desktop Table */}
+            <div className="hidden md:block w-full overflow-x-auto rounded-lg border bg-card">
+                <Table className="w-full">
+                    <TableHeader className="bg-muted/50">
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow key={headerGroup.id} className="hover:bg-muted/50 data-[state=selected]:bg-muted/50 border-b">
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className="h-10 px-4 text-left align-middle text-xs font-semibold text-muted-foreground">
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
@@ -155,12 +161,12 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="[&_tr:last-child]:border-0">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className="border-b transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted">
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} className="p-3 px-4 align-middle text-sm text-foreground">
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}
@@ -168,13 +174,95 @@ export function DataTable<TData extends { id: string; title?: string }, TValue>(
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
                                     No events found.
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="md:hidden flex flex-col gap-4">
+                {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => {
+                        const event = row.original;
+                        const statusColor = event.status?.toLowerCase() === 'upcoming' ? 'bg-secondary text-secondary-foreground' : 
+                                            event.status?.toLowerCase() === 'ongoing' ? 'bg-primary text-primary-foreground' : 
+                                            'bg-muted text-muted-foreground';
+
+                        return (
+                            <div key={row.id} className="flex flex-col rounded-xl border bg-card shadow-sm p-4 pt-5 relative">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex gap-3">
+                                        <Avatar className="h-10 w-10 border border-border rounded-md">
+                                            <AvatarImage src={event.cover_image ?? ""} />
+                                            <AvatarFallback className="bg-muted text-xs font-medium text-foreground rounded-md">{event.title?.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-bold text-foreground">{event.title}</span>
+                                            <span className="text-xs text-muted-foreground">{event.subtitle || "No subtitle"}</span>
+                                        </div>
+                                    </div>
+                                    <Badge variant="secondary" className={`text-[10px] font-bold uppercase px-2 py-0.5 ${statusColor}`}>
+                                        {event.status || "Unknown"}
+                                    </Badge>
+                                </div>
+
+                                <div className="rounded-lg bg-muted/30 p-3 mb-4 grid grid-cols-2 gap-y-3">
+                                    <div className="col-span-2 flex items-center gap-2 text-xs text-muted-foreground">
+                                        <Calendar className="w-3.5 h-3.5" />
+                                        <span>{event.start_date ? new Date(event.start_date).toLocaleDateString() : 'N/A'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="h-px bg-border w-[calc(100%+2rem)] -ml-4 mb-3"></div>
+
+                                <div className="flex items-center justify-between text-muted-foreground">
+                                    <button className="flex items-center gap-2 text-xs font-medium hover:text-foreground transition-colors group">
+                                        <Pencil className="w-3.5 h-3.5 transition-colors group-hover:text-foreground" /> Edit Details
+                                    </button>
+                                    <button onClick={() => {
+                                        row.toggleSelected(true);
+                                        setIsDeleteDialogOpen(true);
+                                    }} className="text-muted-foreground hover:text-destructive transition-colors">
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className="p-8 text-center text-muted-foreground border rounded-xl bg-card">
+                        No events found.
+                    </div>
+                )}
+            </div>
+
+            {/* Table Footer / Pagination Area */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t pt-4">
+                <div className="text-sm text-muted-foreground sm:text-left text-center w-full sm:w-auto">
+                    Showing <span className="font-semibold text-foreground">1</span> to <span className="font-semibold text-foreground">{table.getRowModel().rows.length}</span> of <span className="font-semibold text-foreground">{data.length}</span> results
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                    <div className="flex items-center gap-1 sm:hidden text-sm font-medium text-muted-foreground mx-auto mb-2">
+                        Page <span className="text-foreground">1</span> of 3
+                    </div>
+                    <div className="flex items-center gap-2 justify-between w-full sm:w-auto">
+                        <Button variant="outline" size="sm" className="h-8 md:px-3" disabled>
+                            <ChevronLeft className="w-4 h-4" />
+                        </Button>
+                        <div className="hidden sm:flex items-center gap-1">
+                            <Button variant="outline" size="sm" className="h-8 w-8 p-0 bg-muted font-medium text-foreground">1</Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:bg-muted/50 hover:text-foreground">2</Button>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-muted-foreground hover:bg-muted/50 hover:text-foreground">3</Button>
+                        </div>
+                        <Button variant="outline" size="sm" className="h-8 md:px-3">
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </div>
             </div>
 
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

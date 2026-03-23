@@ -12,8 +12,9 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button"
-import { Plus, CheckCircle2, XCircle } from "lucide-react"
+import { Plus, CheckCircle2, XCircle, Search, Filter, Download, Eye } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Input } from "@/components/ui/input"
 
 interface EventsClientProps {
     initialData: Event[]
@@ -27,6 +28,16 @@ export function EventsClient({ initialData }: EventsClientProps) {
     } | null>(null)
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false)
     const [editingEvent, setEditingEvent] = React.useState<Event | null>(null)
+    const [searchQuery, setSearchQuery] = React.useState("")
+
+    const filteredData = React.useMemo(() => {
+        if (!searchQuery) return data;
+        const lowerQ = searchQuery.toLowerCase();
+        return data.filter(item => 
+            (item.title && item.title.toLowerCase().includes(lowerQ)) ||
+            (item.subtitle && item.subtitle.toLowerCase().includes(lowerQ))
+        );
+    }, [data, searchQuery])
 
     const handleEditEvent = React.useCallback((event: Event) => {
         setEditingEvent(event)
@@ -96,14 +107,25 @@ export function EventsClient({ initialData }: EventsClientProps) {
                 </div>
             )}
 
-            <div className="flex justify-between items-center w-full">
-                <div>
-                    <h1>Events</h1>
+            {/* Header Section */}
+            <div className="gsap-fade-up flex flex-col md:flex-row md:justify-between md:items-start gap-4 w-full">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Events</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage your events and schedule.
+                    </p>
                 </div>
-                <div>
+                
+                <div className="flex w-full md:w-auto flex-col sm:flex-row shadow-sm sm:shadow-none gap-2">
+                    <Button variant="outline" className="w-full sm:w-auto h-10 shadow-sm order-2 sm:order-1">
+                        <Download className="w-4 h-4 mr-2" /> Export
+                    </Button>
+
                     <Drawer direction="right" open={isDrawerOpen} onOpenChange={handleDrawerOpenChange}>
                         <DrawerTrigger asChild>
-                            <Button variant="outline"><Plus />Add Event</Button>
+                            <Button className="w-full sm:w-auto h-10 order-1 sm:order-2">
+                                <Plus className="w-4 h-4 mr-2" /> Add Event
+                            </Button>
                         </DrawerTrigger>
                         <DrawerContent className="no-scrollbar overflow-y-auto overflow-x-hidden">
                             <DrawerHeader className="sr-only">
@@ -122,10 +144,23 @@ export function EventsClient({ initialData }: EventsClientProps) {
                 </div>
             </div>
 
+            {/* Filter and Search Bar */}
+            <div className="gsap-fade-up w-full pt-2">
+                <div className="relative w-full md:max-w-md">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search events..." 
+                        className="pl-9 h-10 bg-background"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
+
             <div className="py-10 w-full">
                 <DataTable
                     columns={getColumns(handleEditEvent, handleDeleteSuccess)}
-                    data={data}
+                    data={filteredData}
                 />
             </div>
         </div>

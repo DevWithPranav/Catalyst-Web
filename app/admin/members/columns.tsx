@@ -9,10 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   Avatar,
-  AvatarBadge,
   AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
   AvatarImage,
 } from "@/components/ui/avatar"
 
@@ -111,92 +108,73 @@ export function getColumns(onEditClick?: (member: Payment) => void): ColumnDef<P
     }
     ,
     {
-      accessorKey: "avatar",
-      header: "",
+      accessorKey: "member",
+      header: () => <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Member</span>,
       cell: ({ row }) => {
         const payment = row.original
 
         return (
-          <Avatar size="sm">
-            <AvatarImage src={payment.photo} />
-            <AvatarFallback>{payment.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <div className="flex items-center gap-3 py-1">
+            <Avatar className="h-9 w-9 border border-border">
+              <AvatarImage src={payment.photo} />
+              <AvatarFallback className="bg-muted text-xs">{payment.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium leading-none">{payment.name}</span>
+              <span className="text-xs text-muted-foreground mt-1">{payment.email}</span>
+            </div>
+          </div>
         )
       },
     },
     {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
       accessorKey: "organization",
-      header: "Organization",
+      header: () => <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Organization</span>,
       cell: ({ row }) => {
         const organizations = row.getValue("organization") as string
         const orgArray = organizations.split(",").map(org => org.trim()).filter(Boolean)
+        const primaryOrg = orgArray[0] || "Unknown"
 
         return (
-          <div className="max-w-xs">
-            <div className="flex flex-wrap gap-1">
-              {orgArray.slice(0, 3).map((org, index) => (
-                <Badge key={index} variant="secondary">
-                  {org}
-                </Badge>
-              ))}
-            </div>
-            {orgArray.length > 3 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {orgArray.slice(3).map((org, index) => (
-                  <Badge key={index + 3} variant="secondary">
-                    {org}
-                  </Badge>
-                ))}
-              </div>
-            )}
+          <div className="flex flex-col py-1">
+             <span className="text-sm">{primaryOrg}</span>
+             <span className="text-[10px] tracking-wider text-muted-foreground mt-1 uppercase">Enterprise Plan</span>
           </div>
         )
       },
     },
     {
       accessorKey: "roles",
-      header: "Roles",
+      header: () => <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Roles</span>,
       cell: ({ row }) => {
         const roles = row.getValue("roles") as string
         const rolesArray = roles.split(",").map(role => role.trim()).filter(Boolean)
 
         return (
-          <div className="max-w-xs">
-            <div className="flex flex-wrap gap-1">
-              {rolesArray.slice(0, 3).map((role, index) => (
-                <Badge key={index} variant="outline">
+          <div className="flex flex-wrap gap-1.5 py-1">
+              {rolesArray.map((role, index) => (
+                <Badge key={index} variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 text-[10px] font-medium px-2 py-0 border-border">
                   {role}
                 </Badge>
               ))}
-            </div>
-            {rolesArray.length > 3 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {rolesArray.slice(3).map((role, index) => (
-                  <Badge key={index + 3} variant="outline">
-                    {role}
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
         )
       },
     },
     {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
       accessorKey: "join_date",
-      header: "Join Date",
-    },
-    {
-      accessorKey: "leave_date",
-      header: "Leave Date",
+      header: () => <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">Join Date</span>,
+      cell: ({ row }) => {
+        const dateString = row.getValue("join_date") as string;
+        let formattedDate = dateString;
+        try {
+            if (dateString) {
+                const date = new Date(dateString);
+                formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+            }
+        } catch(e) {}
+        return <div className="text-sm py-1 font-medium">{formattedDate}</div>
+      }
     },
     {
       id: "actions",
@@ -271,25 +249,30 @@ export function getColumns(onEditClick?: (member: Payment) => void): ColumnDef<P
               </div>
             )}
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => onEditClick?.(payment)}
-              >
-                <Pencil />
-              </Button>
-
+            <div className="flex items-center gap-1">
               <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0 text-muted-foreground hover:text-white">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[160px]">
+                    <DropdownMenuItem onClick={() => onEditClick?.(payment)} className="cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4" />
+                      <span>Edit User</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete User</span>
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Member</AlertDialogTitle>
@@ -299,7 +282,7 @@ export function getColumns(onEditClick?: (member: Payment) => void): ColumnDef<P
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+                    <AlertDialogAction onClick={handleDelete} disabled={isDeleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                       {isDeleting ? "Deleting..." : "Delete"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
