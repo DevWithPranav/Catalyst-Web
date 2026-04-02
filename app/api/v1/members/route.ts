@@ -5,6 +5,7 @@ import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
 import { handleError, badRequest, successResponse } from "@/lib/utils/api-response";
 import { uploadFile } from "@/lib/utils/storage";
 import { validateFields, formatValidationErrors, isStringArray } from "@/lib/utils/validation";
+import { FORM_FIELDS } from "@/lib/utils/form-safety";
 import { parsePagination, paginationQueries } from "@/lib/utils/pagination";
 
 export async function GET(request: Request) {
@@ -159,13 +160,9 @@ export async function POST(request: Request) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
 
-    if (!name || !email) {
-      return badRequest("Name and email are required");
-    }
-
     const errors = validateFields([
-      { field: "name", value: name, required: true, maxLength: 255 },
-      { field: "email", value: email, required: true, type: "email" },
+      { field: "name", value: name, required: FORM_FIELDS.member.name.required, maxLength: 255 },
+      { field: "email", value: email, required: FORM_FIELDS.member.email.required, type: "email" },
       { field: "phone", value: phone, type: "phone" },
     ]);
     if (errors.length > 0) {

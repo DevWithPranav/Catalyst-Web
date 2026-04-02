@@ -6,6 +6,7 @@ import { handleError, badRequest } from "@/lib/utils/api-response";
 import { uploadFile } from "@/lib/utils/storage";
 import { parsePagination, paginationQueries } from "@/lib/utils/pagination";
 import { validateFields, formatValidationErrors } from "@/lib/utils/validation";
+import { FORM_FIELDS } from "@/lib/utils/form-safety";
 
 export async function GET(request: Request) {
     try {
@@ -67,12 +68,12 @@ export async function POST(request: Request) {
         const is_featured = formData.get("is_featured") === "true";
         const org = formData.get("org") as string;
 
-        if (!title || title.trim().length === 0) {
+        if (FORM_FIELDS.achievement.title.required && (!title || title.trim().length === 0)) {
             return badRequest("Achievement title is required");
         }
 
         const errors = validateFields([
-            { field: "title", value: title, required: true, maxLength: 255 },
+            { field: "title", value: title, required: FORM_FIELDS.achievement.title.required, maxLength: 255 },
             { field: "slug", value: slug, type: "slug", maxLength: 255 },
             { field: "subtitle", value: subtitle, maxLength: 255 },
             { field: "description", value: description, maxLength: 2000 },

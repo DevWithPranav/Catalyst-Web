@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { postActionLog } from "@/lib/utils/action-log"
+import { sanitizeText, FORM_FIELDS, enforceTitleChars, containsDangerousContent } from "@/lib/utils/form-safety"
 import { Button } from "@/components/ui/button"
 import {
     AlertDialog,
@@ -39,15 +40,23 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
 
         if (!role) return
 
-        if (!roleName.trim()) {
-            setError("Role name is required")
+        const trimmed = sanitizeText(roleName, FORM_FIELDS.role.name.maxLength)
+        if (FORM_FIELDS.role.name.required && !trimmed) {
+            setError("Required")
             return
         }
 
-        if (roleName.length < 2) {
+        if (trimmed.length < 2) {
             setError("Role name must be at least 2 characters")
             return
         }
+
+        if (containsDangerousContent(trimmed)) {
+            setError("Invalid characters detected")
+            return
+        }
+
+        const sanitizedName = trimmed
 
         setIsSubmitting(true)
         setError("")
@@ -59,7 +68,7 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name: roleName }),
+                body: JSON.stringify({ name: sanitizedName }),
             })
 
             const result = await response.json()
@@ -73,12 +82,12 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
                 action: "Updated Role",
                 entity_type: "role",
                 entity_id: role.id,
-                entity_name: `Updated role to "${roleName}"`,
+                entity_name: `Updated role to "${sanitizedName}"`,
                 status: "success",
-                details: `New name: ${roleName}`,
+                details: `New name: ${sanitizedName}`,
             })
             if (onSuccess) {
-                onSuccess(roleName)
+                onSuccess(sanitizedName)
             }
 
             // Reset form
@@ -117,18 +126,19 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
-                    <div className="py-4 space-y-2">
-                        <Label htmlFor="edit-role-name">Role Name</Label>
+                    {FORM_FIELDS.role.name.enabled && <div className="py-4 space-y-2">
+                        <Label htmlFor="edit-role-name">Role Name {FORM_FIELDS.role.name.required && <span className="text-destructive">*</span>}</Label>
                         <Input
                             id="edit-role-name"
                             placeholder="Enter role name"
                             value={roleName}
                             onChange={(e) => {
-                                setRoleName(e.target.value)
+                                setRoleName(enforceTitleChars(e.target.value))
                                 setError("")
                             }}
                             autoFocus
                             disabled={isSubmitting}
+                            maxLength={FORM_FIELDS.role.name.maxLength}
                         />
                         {error && (
                             <p className="text-sm text-destructive">{error}</p>
@@ -136,7 +146,7 @@ export function EditRoleForm({ role, open, onOpenChange, onSuccess }: EditRoleFo
                         <p className="text-sm text-muted-foreground">
                             This is the name that will be displayed for the role.
                         </p>
-                    </div>
+                    </div>}
 
                     <AlertDialogFooter>
                         <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>

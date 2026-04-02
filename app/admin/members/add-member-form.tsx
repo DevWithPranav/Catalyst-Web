@@ -22,6 +22,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 import * as z from "zod"
+import { sanitizeFormData, buildSanitizeRules, FORM_FIELDS, EMAIL_REGEX, PHONE_REGEX, enforceNameChars, enforceNoSpaces, enforcePhoneChars, containsDangerousContent } from "@/lib/utils/form-safety"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -52,24 +53,25 @@ import { CheckCircle2, XCircle } from "lucide-react"
 const formSchema = z.object({
     name: z
         .string()
-        .min(3, "Bug title must be at least 5 characters.")
-        .max(32, "Bug title must be at most 32 characters."),
+        .refine(v => !FORM_FIELDS.member.name.required || v.trim().length > 0, { message: "Required" })
+        .refine(v => !/\d/.test(v), { message: "Name cannot contain numbers" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => v.trim().length === 0 || v.trim().length >= 3, { message: "Name must be at least 3 characters." }),
     email: z
         .string()
-        .min(5, "Description must be at least 20 characters.")
-        .max(100, "Description must be at most 100 characters."),
-    phone: z.string(),
-    photo: z.any().optional(),
-    organization: z.array(z.object({
-        name: z.string(),
-    })),
-    roles: z.array(z.object({
-        name: z.string(),
-    })),
-    join_date: z.string(),
-    leave_date: z.string(),
-
-
+        .refine(v => !FORM_FIELDS.member.email.required || v.trim().length > 0, { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => v.trim().length === 0 || EMAIL_REGEX.test(v), { message: "Enter valid email" }),
+    phone: z
+        .string()
+        .refine(v => !FORM_FIELDS.member.phone.required || v.trim().length > 0, { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => v.trim().length === 0 || PHONE_REGEX.test(v), { message: "Enter valid phone" }),
+    photo: z.any().optional().refine(v => !FORM_FIELDS.member.photo.required || v, { message: "Required" }),
+    organization: z.array(z.object({ name: z.string() })).refine(v => !FORM_FIELDS.member.organization.required || v.length > 0, { message: "Required" }),
+    roles: z.array(z.object({ name: z.string() })).refine(v => !FORM_FIELDS.member.roles.required || v.length > 0, { message: "Required" }),
+    join_date: z.string().optional().refine(v => !FORM_FIELDS.member.join_date.required || (v && v.trim().length > 0), { message: "Required" }),
+    leave_date: z.string().optional().refine(v => !FORM_FIELDS.member.leave_date.required || (v && v.trim().length > 0), { message: "Required" }),
 })
 
 export default function AddMemberForm({
@@ -127,7 +129,8 @@ export default function AddMemberForm({
         },
     })
 
-    async function onSubmit(data: z.infer<typeof formSchema>) {
+    async function onSubmit(rawData: z.infer<typeof formSchema>) {
+        const data = sanitizeFormData(rawData, buildSanitizeRules(FORM_FIELDS.member))
         console.log("Form data:", data)
         setIsSubmitting(true)
 
@@ -155,11 +158,11 @@ export default function AddMemberForm({
             formData.append("name", data.name)
             formData.append("email", data.email)
             formData.append("phone", data.phone)
-            formData.append("photo", data.photo)
+            if (data.photo) formData.append("photo", data.photo)
             formData.append("organization", data.organization.map((org: any) => org.name).join(","))
             formData.append("roles", data.roles.map((role: any) => role.name).join(","))
-            formData.append("join_date", data.join_date)
-            formData.append("leave_date", data.leave_date)
+            if (data.join_date) formData.append("join_date", data.join_date)
+            if (data.leave_date) formData.append("leave_date", data.leave_date)
 
             const response = await fetch("/api/v1/members", {
                 method: "POST",
@@ -172,6 +175,7 @@ export default function AddMemberForm({
                 form.reset()
                 setJoinDate(undefined)
                 setLeaveDate(undefined)
+                return
             }
             const errorMessage = result.error || result.message || result.details || "Failed to submit"
             console.error("Error:", errorMessage)
@@ -231,20 +235,22 @@ export default function AddMemberForm({
                 <CardContent>
                     <form id="add-member" onSubmit={form.handleSubmit(onSubmit)}>
                         <FieldGroup>
-                            <Controller
+                            {FORM_FIELDS.member.name.enabled && <Controller
                                 name="name"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor="add-member-name">
-                                            Name
+                                            Name {FORM_FIELDS.member.name.required && <span className="text-destructive">*</span>}
                                         </FieldLabel>
                                         <Input
                                             {...field}
+                                            onChange={(e) => field.onChange(enforceNameChars(e.target.value))}
                                             id="add-member-name"
                                             aria-invalid={fieldState.invalid}
                                             placeholder="Enter your name"
                                             autoComplete="off"
+                                            maxLength={FORM_FIELDS.member.name.maxLength}
                                         />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
@@ -254,42 +260,46 @@ export default function AddMemberForm({
                                         </FieldDescription>
                                     </Field>
                                 )}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.email.enabled && <Controller
                                 name="email"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor="add-member-email">
-                                            Email
+                                            Email {FORM_FIELDS.member.email.required && <span className="text-destructive">*</span>}
                                         </FieldLabel>
                                         <Input
                                             {...field}
+                                            onChange={(e) => field.onChange(enforceNoSpaces(e.target.value))}
                                             id="add-member-email"
                                             aria-invalid={fieldState.invalid}
                                             placeholder="Enter your email"
                                             autoComplete="off"
+                                            maxLength={FORM_FIELDS.member.email.maxLength}
                                         />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
                                         )}
                                     </Field>
                                 )}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.phone.enabled && <Controller
                                 name="phone"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor="add-member-phone">
-                                            Phone
+                                            Phone {FORM_FIELDS.member.phone.required && <span className="text-destructive">*</span>}
                                         </FieldLabel>
                                         <Input
                                             {...field}
+                                            onChange={(e) => field.onChange(enforcePhoneChars(e.target.value))}
                                             id="add-member-phone"
                                             aria-invalid={fieldState.invalid}
-                                            placeholder="Enter your name"
+                                            placeholder="Enter phone number"
                                             autoComplete="off"
+                                            maxLength={FORM_FIELDS.member.phone.maxLength}
                                         />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
@@ -299,14 +309,14 @@ export default function AddMemberForm({
                                         </FieldDescription>
                                     </Field>
                                 )}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.photo.enabled && <Controller
                                 name="photo"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor="add-member-photo">
-                                            Photo
+                                            Photo {FORM_FIELDS.member.photo.required && <span className="text-destructive">*</span>}
                                         </FieldLabel>
                                         <Input
                                             id="add-member-photo"
@@ -359,8 +369,8 @@ export default function AddMemberForm({
                                         </FieldDescription>
                                     </Field>
                                 )}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.organization.enabled && <Controller
                                 name="organization"
                                 control={form.control}
                                 render={({ field, fieldState }) => {
@@ -378,7 +388,7 @@ export default function AddMemberForm({
                                     return (
                                         <Field data-invalid={fieldState.invalid}>
                                             <FieldLabel htmlFor="add-member-organization">
-                                                Organization
+                                                Organization {FORM_FIELDS.member.organization.required && <span className="text-destructive">*</span>}
                                             </FieldLabel>
 
                                             {/* Selected organizations as badges */}
@@ -441,8 +451,8 @@ export default function AddMemberForm({
                                         </Field>
                                     )
                                 }}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.roles.enabled && <Controller
                                 name="roles"
                                 control={form.control}
                                 render={({ field, fieldState }) => {
@@ -460,7 +470,7 @@ export default function AddMemberForm({
                                     return (
                                         <Field data-invalid={fieldState.invalid}>
                                             <FieldLabel htmlFor="add-member-roles">
-                                                Roles
+                                                Roles {FORM_FIELDS.member.roles.required && <span className="text-destructive">*</span>}
                                             </FieldLabel>
 
                                             {/* Selected roles as badges */}
@@ -523,14 +533,14 @@ export default function AddMemberForm({
                                         </Field>
                                     )
                                 }}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.join_date.enabled && <Controller
                                 name="join_date"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor="add-member-join_date">
-                                            Join Date
+                                            Join Date {FORM_FIELDS.member.join_date.required && <span className="text-destructive">*</span>}
                                         </FieldLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -560,14 +570,14 @@ export default function AddMemberForm({
                                         </FieldDescription>
                                     </Field>
                                 )}
-                            />
-                            <Controller
+                            />}
+                            {FORM_FIELDS.member.leave_date.enabled && <Controller
                                 name="leave_date"
                                 control={form.control}
                                 render={({ field, fieldState }) => (
                                     <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor="add-member-leave_date">
-                                            Leave Date
+                                            Leave Date {FORM_FIELDS.member.leave_date.required && <span className="text-destructive">*</span>}
                                         </FieldLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -597,7 +607,7 @@ export default function AddMemberForm({
                                         </FieldDescription>
                                     </Field>
                                 )}
-                            />
+                            />}
                         </FieldGroup>
                     </form>
                 </CardContent>
