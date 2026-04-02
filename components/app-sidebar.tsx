@@ -3,6 +3,7 @@
 import * as React from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import {
   Home,
   Users,
@@ -12,13 +13,13 @@ import {
   ScrollText,
   Settings,
   UserCircle,
-  Search,
   ChevronDown,
   ChevronRight,
   Headphones,
   Zap,
   User,
   LogOut,
+  PanelLeft,
 } from "lucide-react"
 
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -37,7 +38,6 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarRail,
-  SidebarInput,
   SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
@@ -90,7 +90,7 @@ function NavItemRow({ item }: { item: NavItem }) {
           tooltip={item.title}
           isActive={isActive || isChildActive}
           onClick={() => !isCollapsed && setOpen((v) => !v)}
-          className="justify-between"
+          className="justify-between "
         >
           <span className="flex items-center gap-2">
             {React.createElement(item.icon, { className: "size-4 shrink-0" })}
@@ -144,41 +144,48 @@ function NavItemRow({ item }: { item: NavItem }) {
 
 // ─── Main sidebar ─────────────────────────────────────────────────────────────
 export function AppSidebar() {
-  const { state } = useSidebar()
+  const { state, toggleSidebar } = useSidebar()
   const isCollapsed = state === "collapsed"
 
   return (
     <Sidebar collapsible="icon">
       {/* ── Header ─────────────────────────────────────────────── */}
-      <SidebarHeader className="border-b">
-        <div className="flex items-center gap-3">
-          {/* Logo mark */}
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <div className="size-3.5 rounded-sm border-2 border-primary-foreground"></div>
-          </div>
+      <SidebarHeader className="w-full border-b h-16 flex items-center">
+        <div className={cn("flex items-center w-full h-full", isCollapsed ? "justify-center" : "justify-between gap-3")}>
+          {/* Logo mark — clicks open the sidebar when collapsed */}
+          <button
+            onClick={toggleSidebar}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            title={isCollapsed ? "Open sidebar" : ""}
+          >
+            <Image
+              src="/Catalyst_Logo_Navbar.png"
+              alt="Catalyst Logo"
+              width={28}
+              height={28}
+              className="shrink-0 rounded-md"
+            />
+            {!isCollapsed && (
+              <span className="text-sm font-bold tracking-tight text-foreground">
+                Catalyst Admin Panel
+              </span>
+            )}
+          </button>
+
+          {/* Close button — only visible when sidebar is expanded */}
           {!isCollapsed && (
-            <span className="text-sm font-bold tracking-tight text-foreground">
-              Nexus Admin
-            </span>
+            <button
+              onClick={toggleSidebar}
+              title="Close sidebar"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0"
+            >
+              <PanelLeft className="size-4" />
+            </button>
           )}
         </div>
       </SidebarHeader>
 
-      {/* ── Search ─────────────────────────────────────────────── */}
-      {!isCollapsed && (
-        <SidebarGroup className="py-2 px-3 pb-0">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-            <SidebarInput
-              placeholder="Search..."
-              className="pl-8 h-9 text-xs border bg-background placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring"
-            />
-            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex items-center gap-0.5 rounded border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground font-mono">
-              ⌘K
-            </kbd>
-          </div>
-        </SidebarGroup>
-      )}
+
 
       {/* ── Main content ───────────────────────────────────────── */}
       <SidebarContent className="gap-0">

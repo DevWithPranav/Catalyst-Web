@@ -4,6 +4,7 @@ import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
 import { handleError, badRequest, notFound, successResponse } from "@/lib/utils/api-response";
 import { uploadFile, deleteFileByUrl } from "@/lib/utils/storage";
 import { validateFields, formatValidationErrors } from "@/lib/utils/validation";
+import { FORM_FIELDS } from "@/lib/utils/form-safety";
 
 export async function GET(
     request: Request,
@@ -65,7 +66,7 @@ export async function PATCH(
         }
 
         const errors = validateFields([
-            { field: "title", value: updateData.title, required: true, maxLength: 255 },
+            { field: "title", value: updateData.title, required: FORM_FIELDS.achievement.title.required, maxLength: 255 },
             { field: "subtitle", value: updateData.subtitle, maxLength: 255 },
             { field: "description", value: updateData.description, maxLength: 2000 },
             { field: "date", value: updateData.date, type: "date" },

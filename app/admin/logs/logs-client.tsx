@@ -90,8 +90,10 @@ export function LogsClient({ initialData, total }: LogsClientProps) {
                 </div>
                 
                 <div className="flex w-full md:w-auto flex-col sm:flex-row shadow-sm sm:shadow-none gap-2">
-                    <Button variant="outline" className="w-full sm:w-auto h-10 shadow-sm order-2 sm:order-1">
-                        <Download className="w-4 h-4 mr-2" /> Export
+                    <Button variant="outline" className="w-full sm:w-auto h-10 shadow-sm" asChild>
+                        <a href="/api/v1/export?collection=ACTION_LOGS">
+                            <Download className="w-4 h-4 mr-2" /> Export
+                        </a>
                     </Button>
                     <Button
                         variant="outline"

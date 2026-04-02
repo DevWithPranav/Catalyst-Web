@@ -20,6 +20,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import * as z from "zod"
+import { sanitizeFormData, buildSanitizeRules, FORM_FIELDS, URL_REGEX, enforceNoSpaces, enforceTitleChars, containsDangerousContent } from "@/lib/utils/form-safety"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -50,18 +51,30 @@ const STATUS_OPTIONS = [
 ]
 
 const formSchema = z.object({
-    title: z.string().min(2, "Title must be at least 2 characters.").max(255),
-    subtitle: z.string().max(255).optional(),
-    description: z.string().max(2000, "Description must be at most 2000 characters.").optional(),
-    cover_image: z.any().optional(),
+    title: z.string()
+        .refine(v => !FORM_FIELDS.event.title.required || v.trim().length > 0, { message: "Required" })
+        .refine(v => v.trim().length === 0 || !/^\d+$/.test(v.trim()), { message: "Title cannot be only numbers" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => v.trim().length === 0 || v.trim().length >= 2, { message: "Title must be at least 2 characters." }),
+    subtitle: z.string().optional()
+        .refine(v => !FORM_FIELDS.event.subtitle.required || (v && v.trim().length > 0), { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => !v || v.trim().length <= 255, { message: "Subtitle must be at most 255 characters." }),
+    description: z.string().optional()
+        .refine(v => !FORM_FIELDS.event.description.required || (v && v.trim().length > 0), { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => !v || v.trim().length <= 2000, { message: "Description must be at most 2000 characters." }),
+    cover_image: z.any().optional().refine(v => !FORM_FIELDS.event.cover_image.required || v, { message: "Required" }),
     related_images: z.any().optional(),
-    start_date: z.string().optional(),
-    end_date: z.string().optional(),
+    start_date: z.string().optional().refine(v => !FORM_FIELDS.event.start_date.required || (v && v.trim().length > 0), { message: "Required" }),
+    end_date: z.string().optional().refine(v => !FORM_FIELDS.event.end_date.required || (v && v.trim().length > 0), { message: "Required" }),
     register_link: z
         .string()
         .optional()
-        .refine((v) => !v || /^https?:\/\/.+/.test(v), { message: "Must be a valid URL" }),
-    status: z.string().optional(),
+        .refine((v) => !FORM_FIELDS.event.register_link.required || (v && v.trim().length > 0), { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine((v) => !v || URL_REGEX.test(v), { message: "Enter valid url" }),
+    status: z.string().optional().refine(v => !FORM_FIELDS.event.status.required || (v && v.trim().length > 0), { message: "Required" }),
     is_featured: z.enum(["true", "false"]),
 })
 
@@ -257,7 +270,12 @@ export default function AddEventForm({
         ].filter(Boolean).join(" | ")
     }
 
-    async function onSubmit(data: FormValues) {
+    async function onSubmit(rawData: FormValues) {
+        if (FORM_FIELDS.event.related_images.required && relatedFiles.length === 0) {
+            setRelatedError("Required")
+            return
+        }
+        const data = sanitizeFormData(rawData, buildSanitizeRules(FORM_FIELDS.event))
         if (isEditMode) {
             setIsSubmitting(true)
             try {
@@ -397,52 +415,56 @@ export default function AddEventForm({
                     <FieldGroup>
 
                         {/* Title */}
-                        <Controller
+                        {FORM_FIELDS.event.title.enabled && <Controller
                             name="title"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ev-title">Title</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="ev-title"
-                                        placeholder="Event title"
-                                        autoComplete="off"
-                                        aria-invalid={fieldState.invalid}
-                                        disabled={isLocked}
-                                    />
+                                    <FieldLabel htmlFor="ev-title">Title {FORM_FIELDS.event.title.required && <span className="text-destructive">*</span>}</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            onChange={(e) => field.onChange(enforceTitleChars(e.target.value))}
+                                            id="ev-title"
+                                            placeholder="Event title"
+                                            autoComplete="off"
+                                            aria-invalid={fieldState.invalid}
+                                            disabled={isLocked}
+                                            maxLength={FORM_FIELDS.event.title.maxLength}
+                                        />
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Subtitle */}
-                        <Controller
+                        {FORM_FIELDS.event.subtitle.enabled && <Controller
                             name="subtitle"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ev-subtitle">Subtitle</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="ev-subtitle"
-                                        placeholder="Short tagline (optional)"
-                                        autoComplete="off"
-                                        aria-invalid={fieldState.invalid}
-                                        disabled={isLocked}
-                                    />
+                                    <FieldLabel htmlFor="ev-subtitle">Subtitle {FORM_FIELDS.event.subtitle.required && <span className="text-destructive">*</span>}</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            onChange={(e) => field.onChange(enforceTitleChars(e.target.value))}
+                                            id="ev-subtitle"
+                                            placeholder="Short tagline (optional)"
+                                            autoComplete="off"
+                                            aria-invalid={fieldState.invalid}
+                                            disabled={isLocked}
+                                            maxLength={FORM_FIELDS.event.subtitle.maxLength}
+                                        />
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Description */}
-                        <Controller
+                        {FORM_FIELDS.event.description.enabled && <Controller
                             name="description"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ev-description">Description</FieldLabel>
+                                    <FieldLabel htmlFor="ev-description">Description {FORM_FIELDS.event.description.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Textarea
                                         {...field}
                                         id="ev-description"
@@ -451,20 +473,21 @@ export default function AddEventForm({
                                         className="resize-y"
                                         aria-invalid={fieldState.invalid}
                                         disabled={isLocked}
+                                        maxLength={FORM_FIELDS.event.description.maxLength}
                                     />
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                     <FieldDescription>Max 2000 characters</FieldDescription>
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Cover Image */}
-                        <Controller
+                        {FORM_FIELDS.event.cover_image.enabled && <Controller
                             name="cover_image"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid || !!coverError}>
-                                    <FieldLabel htmlFor="ev-cover">Cover Image</FieldLabel>
+                                    <FieldLabel htmlFor="ev-cover">Cover Image {FORM_FIELDS.event.cover_image.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Input
                                         id="ev-cover"
                                         type="file"
@@ -489,11 +512,11 @@ export default function AddEventForm({
                                     <FieldDescription>Single image. Max 5 MB.</FieldDescription>
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Related Images */}
-                        <Field>
-                            <FieldLabel htmlFor="ev-related">Related Images</FieldLabel>
+                        {FORM_FIELDS.event.related_images.enabled && <Field>
+                            <FieldLabel htmlFor="ev-related">Related Images {FORM_FIELDS.event.related_images.required && <span className="text-destructive">*</span>}</FieldLabel>
                             <Input
                                 id="ev-related"
                                 type="file"
@@ -529,15 +552,15 @@ export default function AddEventForm({
                             <FieldDescription>
                                 Select one or more images. Max 5 MB each.
                             </FieldDescription>
-                        </Field>
+                        </Field>}
 
                         {/* Start Date */}
-                        <Controller
+                        {FORM_FIELDS.event.start_date.enabled && <Controller
                             name="start_date"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel>Start Date</FieldLabel>
+                                    <FieldLabel>Start Date {FORM_FIELDS.event.start_date.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
@@ -566,15 +589,15 @@ export default function AddEventForm({
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* End Date */}
-                        <Controller
+                        {FORM_FIELDS.event.end_date.enabled && <Controller
                             name="end_date"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel>End Date</FieldLabel>
+                                    <FieldLabel>End Date {FORM_FIELDS.event.end_date.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
@@ -603,15 +626,15 @@ export default function AddEventForm({
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Registration URL */}
-                        <Controller
+                        {FORM_FIELDS.event.register_link.enabled && <Controller
                             name="register_link"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ev-register-link">Registration URL</FieldLabel>
+                                    <FieldLabel htmlFor="ev-register-link">Registration URL {FORM_FIELDS.event.register_link.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     {/* Locked view: show as clickable link */}
                                     {isLocked && field.value ? (
                                         <a
@@ -627,27 +650,29 @@ export default function AddEventForm({
                                     ) : (
                                         <Input
                                             {...field}
+                                            onChange={(e) => field.onChange(enforceNoSpaces(e.target.value))}
                                             id="ev-register-link"
                                             type="url"
                                             placeholder="https://..."
                                             autoComplete="off"
                                             aria-invalid={fieldState.invalid}
                                             disabled={isLocked}
+                                            maxLength={FORM_FIELDS.event.register_link.maxLength}
                                         />
                                     )}
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                     {!isLocked && <FieldDescription>Optional registration link</FieldDescription>}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Status */}
-                        <Controller
+                        {FORM_FIELDS.event.status.enabled && <Controller
                             name="status"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ev-status">Status</FieldLabel>
+                                    <FieldLabel htmlFor="ev-status">Status {FORM_FIELDS.event.status.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button
@@ -681,10 +706,10 @@ export default function AddEventForm({
                                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Is Featured */}
-                        <Controller
+                        {FORM_FIELDS.event.is_featured.enabled && <Controller
                             name="is_featured"
                             control={form.control}
                             render={({ field }) => (
@@ -718,7 +743,7 @@ export default function AddEventForm({
                                     </div>
                                 </Field>
                             )}
-                        />
+                        />}
 
                     </FieldGroup>
                 </form>

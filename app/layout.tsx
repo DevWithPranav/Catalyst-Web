@@ -34,8 +34,8 @@ const poppins = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Your Site Title",
-  description: "Your site description",
+  title: "Catalyst",
+  description: "Catalyst Platform",
 };
 
 export default function RootLayout({

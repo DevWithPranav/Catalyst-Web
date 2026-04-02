@@ -93,8 +93,10 @@ export function RolesClient({ initialData }: RolesClientProps) {
                 </div>
                 
                 <div className="flex w-full md:w-auto flex-col sm:flex-row shadow-sm sm:shadow-none gap-2">
-                    <Button variant="outline" className="w-full sm:w-auto h-10 shadow-sm order-2 sm:order-1">
-                        <Download className="w-4 h-4 mr-2" /> Export
+                    <Button variant="outline" className="w-full sm:w-auto h-10 shadow-sm order-2 sm:order-1" asChild>
+                        <a href="/api/v1/export?collection=ROLES">
+                            <Download className="w-4 h-4 mr-2" /> Export
+                        </a>
                     </Button>
                     <Button className="w-full sm:w-auto h-10 order-1 sm:order-2" onClick={() => setIsAddDialogOpen(true)}>
                         <Plus className="w-4 h-4 mr-2" /> Add Role

@@ -6,6 +6,7 @@ import { handleError, badRequest } from "@/lib/utils/api-response";
 import { uploadFile } from "@/lib/utils/storage";
 import { parsePagination, paginationQueries } from "@/lib/utils/pagination";
 import { validateFields, formatValidationErrors, isStringArray } from "@/lib/utils/validation";
+import { FORM_FIELDS } from "@/lib/utils/form-safety";
 
 export async function GET(request: Request) {
   try {
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
 
     const title = formData.get("title") as string;
-    if (!title || title.trim().length === 0) {
+    if (FORM_FIELDS.event.title.required && (!title || title.trim().length === 0)) {
       return badRequest("Event title is required");
     }
 
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
     };
 
     const errors = validateFields([
-      { field: "title", value: title, required: true, maxLength: 255 },
+      { field: "title", value: title, required: FORM_FIELDS.event.title.required, maxLength: 255 },
       { field: "slug", value: payload.slug, type: "slug", maxLength: 255 },
       { field: "subtitle", value: payload.subtitle, maxLength: 255 },
       { field: "description", value: payload.description, maxLength: 1000 },

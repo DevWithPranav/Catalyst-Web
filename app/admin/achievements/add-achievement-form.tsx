@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import * as z from "zod"
+import { sanitizeFormData, buildSanitizeRules, FORM_FIELDS, enforceTitleChars, containsDangerousContent } from "@/lib/utils/form-safety"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -46,14 +47,25 @@ import { Achievement } from "@/app/admin/achievements/columns"
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
 
 const formSchema = z.object({
-    title: z.string().min(2, "Title must be at least 2 characters.").max(255),
-    subtitle: z.string().max(255).optional(),
-    description: z.string().max(2000, "Description must be at most 2000 characters.").optional(),
-    cover_image: z.any().optional(),
+    title: z.string()
+        .refine(v => !FORM_FIELDS.achievement.title.required || v.trim().length > 0, { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => v.trim().length === 0 || v.trim().length >= 2, { message: "Title must be at least 2 characters." }),
+    subtitle: z.string().optional()
+        .refine(v => !FORM_FIELDS.achievement.subtitle.required || (v && v.trim().length > 0), { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => !v || v.trim().length <= 255, { message: "Subtitle must be at most 255 characters." }),
+    description: z.string().optional()
+        .refine(v => !FORM_FIELDS.achievement.description.required || (v && v.trim().length > 0), { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" })
+        .refine(v => !v || v.trim().length <= 2000, { message: "Description must be at most 2000 characters." }),
+    cover_image: z.any().optional().refine(v => !FORM_FIELDS.achievement.cover_image.required || v, { message: "Required" }),
     related_images: z.any().optional(), // FileList-like, handled separately
     is_featured: z.enum(["true", "false"]),
-    org: z.string().optional(),
-    date: z.string().optional(),
+    org: z.string().optional()
+        .refine(v => !FORM_FIELDS.achievement.org.required || (v && v.trim().length > 0), { message: "Required" })
+        .refine(v => !containsDangerousContent(v), { message: "Invalid characters detected" }),
+    date: z.string().optional().refine(v => !FORM_FIELDS.achievement.date.required || (v && v.trim().length > 0), { message: "Required" }),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -232,7 +244,12 @@ export default function AddAchievementForm({
         ].filter(Boolean).join(" | ")
     }
 
-    async function onSubmit(data: FormValues) {
+    async function onSubmit(rawData: FormValues) {
+        if (FORM_FIELDS.achievement.related_images.required && relatedFiles.length === 0) {
+            setRelatedError("Required")
+            return
+        }
+        const data = sanitizeFormData(rawData, buildSanitizeRules(FORM_FIELDS.achievement))
         if (isEditMode) {
             setIsSubmitting(true)
             try {
@@ -377,56 +394,60 @@ export default function AddAchievementForm({
                     <FieldGroup>
 
                         {/* Title */}
-                        <Controller
+                        {FORM_FIELDS.achievement.title.enabled && <Controller
                             name="title"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ach-title">Title</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="ach-title"
-                                        placeholder="Achievement title"
-                                        autoComplete="off"
-                                        aria-invalid={fieldState.invalid}
-                                        disabled={isLocked}
-                                    />
+                                    <FieldLabel htmlFor="ach-title">Title {FORM_FIELDS.achievement.title.required && <span className="text-destructive">*</span>}</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            onChange={(e) => field.onChange(enforceTitleChars(e.target.value))}
+                                            id="ach-title"
+                                            placeholder="Achievement title"
+                                            autoComplete="off"
+                                            aria-invalid={fieldState.invalid}
+                                            disabled={isLocked}
+                                            maxLength={FORM_FIELDS.achievement.title.maxLength}
+                                        />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
                                     )}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Subtitle */}
-                        <Controller
+                        {FORM_FIELDS.achievement.subtitle.enabled && <Controller
                             name="subtitle"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ach-subtitle">Subtitle</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="ach-subtitle"
-                                        placeholder="Short description (optional)"
-                                        autoComplete="off"
-                                        aria-invalid={fieldState.invalid}
-                                        disabled={isLocked}
-                                    />
+                                    <FieldLabel htmlFor="ach-subtitle">Subtitle {FORM_FIELDS.achievement.subtitle.required && <span className="text-destructive">*</span>}</FieldLabel>
+                                        <Input
+                                            {...field}
+                                            onChange={(e) => field.onChange(enforceTitleChars(e.target.value))}
+                                            id="ach-subtitle"
+                                            placeholder="Short description (optional)"
+                                            autoComplete="off"
+                                            aria-invalid={fieldState.invalid}
+                                            disabled={isLocked}
+                                            maxLength={FORM_FIELDS.achievement.subtitle.maxLength}
+                                        />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
                                     )}
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Description */}
-                        <Controller
+                        {FORM_FIELDS.achievement.description.enabled && <Controller
                             name="description"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ach-description">Description</FieldLabel>
+                                    <FieldLabel htmlFor="ach-description">Description {FORM_FIELDS.achievement.description.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Textarea
                                         {...field}
                                         id="ach-description"
@@ -435,6 +456,7 @@ export default function AddAchievementForm({
                                         className="resize-y"
                                         aria-invalid={fieldState.invalid}
                                         disabled={isLocked}
+                                        maxLength={FORM_FIELDS.achievement.description.maxLength}
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -442,15 +464,15 @@ export default function AddAchievementForm({
                                     <FieldDescription>Max 2000 characters</FieldDescription>
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Cover Image */}
-                        <Controller
+                        {FORM_FIELDS.achievement.cover_image.enabled && <Controller
                             name="cover_image"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid || !!coverError}>
-                                    <FieldLabel htmlFor="ach-cover">Cover Image</FieldLabel>
+                                    <FieldLabel htmlFor="ach-cover">Cover Image {FORM_FIELDS.achievement.cover_image.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Input
                                         id="ach-cover"
                                         type="file"
@@ -475,11 +497,11 @@ export default function AddAchievementForm({
                                     <FieldDescription>Max size: 5 MB</FieldDescription>
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Related Images (multiple) */}
-                        <Field>
-                            <FieldLabel htmlFor="ach-related">Related Images</FieldLabel>
+                        {FORM_FIELDS.achievement.related_images.enabled && <Field>
+                            <FieldLabel htmlFor="ach-related">Related Images {FORM_FIELDS.achievement.related_images.required && <span className="text-destructive">*</span>}</FieldLabel>
                             <Input
                                 id="ach-related"
                                 type="file"
@@ -538,10 +560,10 @@ export default function AddAchievementForm({
                             <FieldDescription>
                                 Select one or more images. Max 5 MB each.
                             </FieldDescription>
-                        </Field>
+                        </Field>}
 
                         {/* Is Featured */}
-                        <Controller
+                        {FORM_FIELDS.achievement.is_featured.enabled && <Controller
                             name="is_featured"
                             control={form.control}
                             render={({ field }) => (
@@ -575,15 +597,15 @@ export default function AddAchievementForm({
                                     </div>
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Organisation */}
-                        <Controller
+                        {FORM_FIELDS.achievement.org.enabled && <Controller
                             name="org"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="ach-org">Organisation</FieldLabel>
+                                    <FieldLabel htmlFor="ach-org">Organisation {FORM_FIELDS.achievement.org.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button
@@ -634,15 +656,15 @@ export default function AddAchievementForm({
                                     <FieldDescription>Select the associated organisation</FieldDescription>
                                 </Field>
                             )}
-                        />
+                        />}
 
                         {/* Date */}
-                        <Controller
+                        {FORM_FIELDS.achievement.date.enabled && <Controller
                             name="date"
                             control={form.control}
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel>Achievement Date</FieldLabel>
+                                    <FieldLabel>Achievement Date {FORM_FIELDS.achievement.date.required && <span className="text-destructive">*</span>}</FieldLabel>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
@@ -673,7 +695,7 @@ export default function AddAchievementForm({
                                     )}
                                 </Field>
                             )}
-                        />
+                        />}
 
                     </FieldGroup>
                 </form>
