@@ -7,10 +7,8 @@
  *  - Action Logs (write-heavy, time-sensitive) → no-store (always fresh)
  */
 
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { getBaseUrl } from "@/lib/get-base-url"
-
-const BASE = getBaseUrl()
 
 // ─── Auth helper ───────────────────────────────────────────────────────────────
 export async function getSessionHeaders(): Promise<{ Cookie: string }> {
@@ -38,7 +36,15 @@ export async function adminFetch<T>(
   } = {}
 ): Promise<T> {
   const { tags = [], revalidate = 60 } = options
-  const headers = await getSessionHeaders()
+  const sessionHeaders = await getSessionHeaders()
+  
+  const headersList = await headers()
+  const host = headersList.get("host")
+  const protocol = headersList.get("x-forwarded-proto") || "http"
+  
+  const BASE = process.env.NEXT_PUBLIC_APP_URL 
+    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+    || (host ? `${protocol}://${host}` : "http://localhost:3000")
 
   const nextOptions: RequestInit["next"] =
     revalidate === false
@@ -47,7 +53,7 @@ export async function adminFetch<T>(
 
   const res = await fetch(`${BASE}${path}`, {
     method: "GET",
-    headers,
+    headers: sessionHeaders,
     next: nextOptions,
   })
 
