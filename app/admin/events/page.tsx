@@ -3,7 +3,7 @@ import { Event } from "./columns"
 import { adminFetch, CACHE_TAGS } from "@/lib/admin-fetcher"
 
 // ISR: revalidate every 60 seconds
-export const revalidate = 60
+
 
 async function getData(): Promise<Event[]> {
     const rawData = await adminFetch<any>("/api/v1/events", {

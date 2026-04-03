@@ -4,7 +4,7 @@ import { Role, Organization } from "./types"
 import { adminFetch, CACHE_TAGS } from "@/lib/admin-fetcher"
 
 // ISR: revalidate this page every 60 seconds
-export const revalidate = 60
+
 
 async function getData(): Promise<Member[]> {
     const rawData = await adminFetch<any>("/api/v1/members", {

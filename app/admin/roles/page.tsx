@@ -3,7 +3,7 @@ import { Role } from "./types"
 import { adminFetch, CACHE_TAGS } from "@/lib/admin-fetcher"
 
 // ISR: roles are static-ish, revalidate every 5 minutes
-export const revalidate = 300
+
 
 async function getRoles(): Promise<Role[]> {
     const rawData = await adminFetch<any>("/api/v1/roles", {
