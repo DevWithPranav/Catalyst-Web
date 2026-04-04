@@ -1,32 +1,20 @@
 /**
- * Centralized, cache-aware data fetcher for all admin server components.
+ * Centralized fetcher for admin server components (loopback to /api/v1).
  *
- * Strategy:
- *  - Roles & Organizations are relatively static → revalidate every 5 minutes
- *  - Members, Events, Achievements → revalidate every 60 seconds
- *  - Action Logs (write-heavy, time-sensitive) → no-store (always fresh)
+ * Uses `cache: "no-store"` so list data is not shared via the Next.js Data Cache
+ * (fixes intermittent empty tables on Vercel). Optional `tags` / `revalidate` on
+ * {@link adminFetch} are accepted for call-site compatibility; route handlers
+ * should continue using `revalidateTag` after mutations.
  */
 
-import { cookies, headers } from "next/headers"
+import { headers } from "next/headers"
+import { getBaseUrlFromRequestHeaders } from "@/lib/get-base-url"
 
-// ─── Auth helper ───────────────────────────────────────────────────────────────
-export async function getSessionHeaders(): Promise<Headers> {
-  const cookieStore = await cookies()
-  // Forward all cookies (important for Vercel deployment protection)
-  const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ')
-  
-  const headers = new Headers();
-  if (allCookies) {
-    headers.set("Cookie", allCookies);
-  }
-  
-  const token = process.env.INTERNAL_API_KEY || "catalyst-internal-ssr";
-  headers.set("x-internal-token", token);
-  
-  // Custom header to distinguish internal fetch from middleware
-  headers.set("x-admin-fetch", "true");
-
-  return headers;
+/** Loopback to Route Handlers: middleware allows `x-internal-token` without a session cookie. */
+function getInternalApiHeaders(): Headers {
+  const h = new Headers()
+  h.set("x-internal-token", process.env.INTERNAL_API_KEY || "catalyst-internal-ssr")
+  return h
 }
 
 // ─── Cache tags (for on-demand revalidation via revalidateTag) ────────────────
@@ -48,20 +36,18 @@ export async function adminFetch<T>(
   } = {}
 ): Promise<T> {
   const { tags = [], revalidate = 60 } = options
-  const sessionHeaders = await getSessionHeaders()
+  const sessionHeaders = getInternalApiHeaders()
 
   const headersList = await headers()
-  const host = headersList.get("host")
-  const protocol = headersList.get("x-forwarded-proto") || "http"
 
-  const BASE = process.env.NEXT_PUBLIC_APP_URL
-    || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
-    || (host ? `${protocol}://${host}` : "http://localhost:3000")
+  // Match the incoming request host (custom domain / preview) and avoid http
+  // defaults on Vercel, which can break loopback fetches.
+  const BASE = getBaseUrlFromRequestHeaders(headersList)
 
-  const nextOptions: RequestInit["next"] =
-    revalidate === false
-      ? { revalidate: 0 }
-      : { revalidate, tags }
+  // Admin lists must not be stored in the Next.js Data Cache — shared or stale
+  // entries on Vercel caused intermittent empty tables for some requests.
+  void tags
+  void revalidate
 
   // Forward the x-vercel-protection-bypass header if it is present
   const vercelBypass = headersList.get("x-vercel-protection-bypass")
@@ -69,13 +55,13 @@ export async function adminFetch<T>(
     (sessionHeaders as Headers).set("x-vercel-protection-bypass", vercelBypass)
   }
 
-  const fetchUrl = `${BASE}${path}`
+  const fetchUrl = `${BASE}${path.startsWith("/") ? path : `/${path}`}`
   let res: Response;
   try {
     res = await fetch(fetchUrl, {
       method: "GET",
       headers: sessionHeaders,
-      next: nextOptions,
+      cache: "no-store",
     })
   } catch (err) {
     throw new Error(`[adminFetch] ${path} fetch failed entirely: ${err}`)

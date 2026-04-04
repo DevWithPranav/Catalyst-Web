@@ -12,11 +12,9 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const INTERNAL_SECRET = process.env.INTERNAL_API_KEY || "catalyst-internal-ssr";
 
-  // Allow internal SSR fetch bypass
+  // Server-side admin SSR uses a shared secret; do not trust x-admin-fetch alone.
   const internalToken = req.headers.get("x-internal-token");
-  const isAdminFetch = req.headers.get("x-admin-fetch") === "true";
-  
-  if ((internalToken === INTERNAL_SECRET && internalToken !== null) || isAdminFetch) {
+  if (internalToken === INTERNAL_SECRET && internalToken !== null) {
     return NextResponse.next();
   }
 

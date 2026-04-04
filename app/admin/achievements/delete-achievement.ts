@@ -1,17 +1,16 @@
 "use server"
 
-import { cookies } from "next/headers"
-import { getBaseUrl } from "@/lib/get-base-url"
+import { headers } from "next/headers"
+import { getBaseUrlFromRequestHeaders } from "@/lib/get-base-url"
 
 export async function deleteAchievement(id: string): Promise<{ success: boolean; error?: string }> {
     try {
-        const cookieStore = await cookies()
-        const sessionCookie = cookieStore.get("admin_session")?.value ?? ""
-        const BASE = getBaseUrl()
+        const BASE = getBaseUrlFromRequestHeaders(await headers())
+        const internal = process.env.INTERNAL_API_KEY || "catalyst-internal-ssr"
         const res = await fetch(`${BASE}/api/v1/achievements/${id}`, {
             method: "DELETE",
             cache: "no-store",
-            headers: { Cookie: `admin_session=${sessionCookie}` },
+            headers: { "x-internal-token": internal },
         })
 
         if (!res.ok) {
