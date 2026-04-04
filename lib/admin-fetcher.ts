@@ -8,18 +8,25 @@
  */
 
 import { cookies, headers } from "next/headers"
-import { getBaseUrl } from "@/lib/get-base-url"
 
 // ─── Auth helper ───────────────────────────────────────────────────────────────
-export async function getSessionHeaders(): Promise<HeadersInit> {
+export async function getSessionHeaders(): Promise<Headers> {
   const cookieStore = await cookies()
   // Forward all cookies (important for Vercel deployment protection)
   const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ')
   
-  return { 
-    Cookie: allCookies,
-    "x-internal-token": process.env.INTERNAL_API_KEY || "catalyst-internal-ssr" 
+  const headers = new Headers();
+  if (allCookies) {
+    headers.set("Cookie", allCookies);
   }
+  
+  const token = process.env.INTERNAL_API_KEY || "catalyst-internal-ssr";
+  headers.set("x-internal-token", token);
+  
+  // Custom header to distinguish internal fetch from middleware
+  headers.set("x-admin-fetch", "true");
+
+  return headers;
 }
 
 // ─── Cache tags (for on-demand revalidation via revalidateTag) ────────────────
@@ -59,16 +66,25 @@ export async function adminFetch<T>(
   // Forward the x-vercel-protection-bypass header if it is present
   const vercelBypass = headersList.get("x-vercel-protection-bypass")
   if (vercelBypass) {
-    (sessionHeaders as Record<string, string>)["x-vercel-protection-bypass"] = vercelBypass
+    (sessionHeaders as Headers).set("x-vercel-protection-bypass", vercelBypass)
   }
 
-  const res = await fetch(`${BASE}${path}`, {
-    method: "GET",
-    headers: sessionHeaders,
-    next: nextOptions,
-  })
+  const fetchUrl = `${BASE}${path}`
+  let res: Response;
+  try {
+    res = await fetch(fetchUrl, {
+      method: "GET",
+      headers: sessionHeaders,
+      next: nextOptions,
+    })
+  } catch (err) {
+    throw new Error(`[adminFetch] ${path} fetch failed entirely: ${err}`)
+  }
 
   if (!res.ok) {
+    let errBody = "";
+    try { errBody = await res.text(); } catch(e) {}
+    console.error(`[adminFetch] ${path} failed: ${res.status} ${res.statusText} - Body: ${errBody}`);
     throw new Error(`[adminFetch] ${path} failed: ${res.status} ${res.statusText}`)
   }
 
