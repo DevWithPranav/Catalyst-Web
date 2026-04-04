@@ -11,10 +11,15 @@ import { cookies, headers } from "next/headers"
 import { getBaseUrl } from "@/lib/get-base-url"
 
 // ─── Auth helper ───────────────────────────────────────────────────────────────
-export async function getSessionHeaders(): Promise<{ Cookie: string }> {
+export async function getSessionHeaders(): Promise<HeadersInit> {
   const cookieStore = await cookies()
-  const value = cookieStore.get("admin_session")?.value ?? ""
-  return { Cookie: `admin_session=${value}` }
+  // Forward all cookies (important for Vercel deployment protection)
+  const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ')
+  
+  return { 
+    Cookie: allCookies,
+    "x-internal-token": process.env.INTERNAL_API_KEY || "catalyst-internal-ssr" 
+  }
 }
 
 // ─── Cache tags (for on-demand revalidation via revalidateTag) ────────────────
@@ -50,6 +55,12 @@ export async function adminFetch<T>(
     revalidate === false
       ? { revalidate: 0 }
       : { revalidate, tags }
+
+  // Forward the x-vercel-protection-bypass header if it is present
+  const vercelBypass = headersList.get("x-vercel-protection-bypass")
+  if (vercelBypass) {
+    (sessionHeaders as Record<string, string>)["x-vercel-protection-bypass"] = vercelBypass
+  }
 
   const res = await fetch(`${BASE}${path}`, {
     method: "GET",
