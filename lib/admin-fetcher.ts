@@ -19,12 +19,12 @@ export async function getSessionHeaders(): Promise<{ Cookie: string }> {
 
 // ─── Cache tags (for on-demand revalidation via revalidateTag) ────────────────
 export const CACHE_TAGS = {
-  members:       "admin-members",
-  roles:         "admin-roles",
+  members: "admin-members",
+  roles: "admin-roles",
   organizations: "admin-organizations",
-  events:        "admin-events",
-  achievements:  "admin-achievements",
-  logs:          "admin-logs",
+  events: "admin-events",
+  achievements: "admin-achievements",
+  logs: "admin-logs",
 } as const
 
 // ─── Generic fetcher ──────────────────────────────────────────────────────────
@@ -37,12 +37,12 @@ export async function adminFetch<T>(
 ): Promise<T> {
   const { tags = [], revalidate = 60 } = options
   const sessionHeaders = await getSessionHeaders()
-  
+
   const headersList = await headers()
   const host = headersList.get("host")
   const protocol = headersList.get("x-forwarded-proto") || "http"
-  
-  const BASE = process.env.NEXT_PUBLIC_APP_URL 
+
+  const BASE = process.env.NEXT_PUBLIC_APP_URL
     || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
     || (host ? `${protocol}://${host}` : "http://localhost:3000")
 
