@@ -2,15 +2,15 @@
 
 import { headers } from "next/headers"
 import { getBaseUrlFromRequestHeaders } from "@/lib/get-base-url"
+import { getLoopbackRequestHeaders } from "@/lib/admin-fetcher"
 
 export async function deleteAchievement(id: string): Promise<{ success: boolean; error?: string }> {
     try {
         const BASE = getBaseUrlFromRequestHeaders(await headers())
-        const internal = process.env.INTERNAL_API_KEY || "catalyst-internal-ssr"
         const res = await fetch(`${BASE}/api/v1/achievements/${id}`, {
             method: "DELETE",
             cache: "no-store",
-            headers: { "x-internal-token": internal },
+            headers: await getLoopbackRequestHeaders(),
         })
 
         if (!res.ok) {
