@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { database } from "@/lib/appwrite/server";
+import { DB_ID, COLLECTIONS } from "@/lib/constants/collections";
+import { handleError, badRequest, notFound, successResponse } from "@/lib/utils/api-response";
 
 export async function GET(
   request: Request,
@@ -8,18 +10,11 @@ export async function GET(
   try {
     const { org_id } = await params;
 
-    const org = await database.getDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
-      org_id
-    );
+    const org = await database.getDocument(DB_ID, COLLECTIONS.ORGANIZATIONS, org_id);
 
     return NextResponse.json(org);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Organization not found", details: error.message },
-      { status: 404 }
-    );
+  } catch (error) {
+    return notFound("Organization not found");
   }
 }
 
@@ -31,26 +26,39 @@ export async function PATCH(
     const { org_id } = await params;
     const body = await request.json();
 
-    if (!body || Object.keys(body).length === 0) {
-      return NextResponse.json(
-        { message: "No update data provided" },
-        { status: 400 }
-      );
+    const allowedFields = ["name"];
+    const updateData: Record<string, string> = {};
+
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return badRequest("No valid update data provided. Allowed fields: name");
+    }
+
+    if (updateData.name !== undefined) {
+      if (typeof updateData.name !== "string" || updateData.name.trim().length === 0) {
+        return badRequest("Organization name must be a non-empty string");
+      }
+      if (updateData.name.length > 255) {
+        return badRequest("Organization name must be at most 255 characters");
+      }
+      updateData.name = updateData.name.trim();
     }
 
     const updatedOrg = await database.updateDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
+      DB_ID,
+      COLLECTIONS.ORGANIZATIONS,
       org_id,
-      body
+      updateData
     );
 
     return NextResponse.json(updatedOrg);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to update organization", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Update organization", error);
   }
 }
 
@@ -61,20 +69,13 @@ export async function DELETE(
   try {
     const { org_id } = await params;
 
-    await database.deleteDocument(
-      process.env.NEXT_APPWRITE_DATABASE_ID!,
-      process.env.NEXT_PUBLIC_APPWRITE_ORGANIZATION_COLLECTION_ID!,
-      org_id
-    );
+    await database.deleteDocument(DB_ID, COLLECTIONS.ORGANIZATIONS, org_id);
 
-    return NextResponse.json({
+    return successResponse({
       message: "Organization deleted successfully",
       id: org_id,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: "Failed to delete organization", details: error.message },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError("Delete organization", error);
   }
 }
