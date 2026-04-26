@@ -2,18 +2,27 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-const timelineData = [
+// Added type definition for the data
+interface TimelineItem {
+  year: string;
+  title: string;
+  description: string;
+  image: string;
+}
+
+const timelineData: TimelineItem[] = [
   {
     year: "1994",
     title: "Year of foundation",
     description:
       "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore.",
     image:
-      "https://images.unsplash.com/photo-1513622470522-26c314a85ee8?q=80&w=1200&auto=format&fit=crop", // Rotterdam/Cityscape placeholder
+      "https://images.unsplash.com/photo-1513622470522-26c314a85ee8?q=80&w=1200&auto=format&fit=crop",
   },
   {
     year: "2005",
@@ -34,32 +43,33 @@ const timelineData = [
 ];
 
 export default function Timeline() {
-  const containerRef = useRef(null);
+  // typed the ref
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Use gsap.context for React-safe cleanup
     const ctx = gsap.context(() => {
-      const sections = gsap.utils.toArray(".timeline-section");
+      // Cast the utility to an HTMLElement array
+      const sections = gsap.utils.toArray<HTMLElement>(".timeline-section");
 
       sections.forEach((section) => {
-        const bgYear = section.querySelector(".bg-year");
-        const leftContent = section.querySelector(".content-left");
-        const rightContent = section.querySelector(".content-right");
-        const centerDot = section.querySelector(".center-dot");
+        // Cast selectors to HTMLElement to satisfy TypeScript
+        const bgYear = section.querySelector<HTMLElement>(".bg-year");
+        const leftContent = section.querySelector<HTMLElement>(".content-left");
+        const rightContent =
+          section.querySelector<HTMLElement>(".content-right");
+        const centerDot = section.querySelector<HTMLElement>(".center-dot");
 
-        // Set initial states
         gsap.set(bgYear, { scale: 0.8, opacity: 0, y: 100 });
         gsap.set(leftContent, { x: -50, opacity: 0 });
         gsap.set(rightContent, { x: 50, opacity: 0 });
         gsap.set(centerDot, { scale: 0, opacity: 0 });
 
-        // Create the scroll-linked animation timeline for entry
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
-            start: "top 75%", // Starts animating when the top of the section hits 75% down the viewport
+            start: "top 75%",
             end: "center center",
-            scrub: 1, // Smooth 1-second delay scrub effect
+            scrub: 1,
           },
         });
 
@@ -86,7 +96,6 @@ export default function Timeline() {
             "<",
           );
 
-        // Create the scroll-linked animation timeline for exit (fading out as you scroll past)
         gsap.to(section, {
           opacity: 0.2,
           scrollTrigger: {
@@ -99,7 +108,7 @@ export default function Timeline() {
       });
     }, containerRef);
 
-    return () => ctx.revert(); // Cleanup on unmount
+    return () => ctx.revert();
   }, []);
 
   return (
@@ -107,7 +116,6 @@ export default function Timeline() {
       ref={containerRef}
       className="relative w-full bg-[#0a1118] text-white font-sans overflow-hidden py-32"
     >
-      {/* Central Dashed Line */}
       <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-600 md:-translate-x-1/2 z-0 opacity-50" />
 
       {timelineData.map((item, index) => (
@@ -115,16 +123,13 @@ export default function Timeline() {
           key={index}
           className="timeline-section relative min-h-screen flex items-center justify-center py-24 px-6 md:px-12 w-full max-w-7xl mx-auto"
         >
-          {/* Background Massive Year (Blurred) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
             <span className="bg-year text-[35vw] font-black text-slate-400 blur-[8px] select-none tracking-tighter mix-blend-overlay">
               {item.year}
             </span>
           </div>
 
-          {/* Content Layout */}
           <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-12 md:gap-24">
-            {/* Left Column: Details */}
             <div className="content-left flex-1 w-full pl-12 md:pl-0 text-left md:text-right">
               <h2 className="text-6xl md:text-8xl font-bold mb-2 tracking-tight">
                 {item.year}
@@ -140,13 +145,10 @@ export default function Timeline() {
               </div>
             </div>
 
-            {/* Center Timeline Dot */}
             <div className="center-dot absolute left-[22px] md:left-1/2 w-4 h-4 rounded-full bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.8)] z-20 -translate-x-1/2 ring-4 ring-[#0a1118]" />
 
-            {/* Right Column: Image */}
             <div className="content-right flex-1 w-full pl-12 md:pl-0">
               <div className="relative w-full aspect-[4/3] md:aspect-video rounded-sm overflow-hidden shadow-2xl border border-slate-800/50">
-                {/* Overlay gradient to match the dark aesthetic */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-[#0a1118]/60 via-transparent to-transparent z-10" />
                 <img
                   src={item.image}
