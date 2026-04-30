@@ -114,7 +114,7 @@ export default function Timeline() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full bg-[#0a1118] text-white font-sans overflow-hidden py-32"
+      className="relative w-full bg-[#0000008f] text-white font-sans overflow-hidden py-32"
     >
       <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-600 md:-translate-x-1/2 z-0 opacity-50" />
 
