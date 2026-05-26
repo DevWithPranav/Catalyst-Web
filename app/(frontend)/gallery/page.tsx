@@ -66,12 +66,15 @@ const items = [
 
 export default function Page() {
   return (
-    <div className="mb-5 ">
-      <div className="relative h-[50vh] flex items-center justify-center font-primary text-white overflow-hidden ">
-        <h1 className="absolute text-5xl opacity-10 select-none">CATALYST</h1>
-        <p className="relative text-xl tracking-wide">GALLERY</p>
+    <div className="mb-5">
+      <div className="relative h-[50vh] flex items-center justify-center font-primary text-white overflow-hidden">
+        <h1 className="absolute text-5xl opacity-10 select-none sm:text-7xl md:text-8xl lg:text-9xl">
+          CATALYST
+        </h1>
+        <p className="relative text-xl tracking-wide sm:text-2xl md:text-3xl lg:text-4xl">
+          GALLERY
+        </p>
       </div>
-
       <div className="mx-5">
         <Masonry
           items={items}
