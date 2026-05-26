@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/dist/ScrollTrigger";
@@ -7,104 +8,205 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-// Added type definition for the data
-interface TimelineItem {
-  year: string;
-  title: string;
-  description: string;
-  image: string;
-}
-
-const timelineData: TimelineItem[] = [
+const achievements = [
   {
-    year: "1994",
-    title: "Year of foundation",
+    id: "01",
+    title: "1st Place Hackathon",
     description:
-      "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore.",
+      "Developed a real-time disaster management system using IoT and AWS Rekognition, beating 200+ teams across the nation.",
+    category: "HACKATHON",
+    date: "2025",
     image:
-      "https://images.unsplash.com/photo-1513622470522-26c314a85ee8?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400",
   },
   {
-    year: "2005",
-    title: "Global Expansion",
+    id: "02",
+    title: "SIH Finalist",
     description:
-      "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem.",
+      "Shortlisted for the national finals for an innovative drone-based surveillance system that impressed the jury.",
+    category: "NATIONAL EVENT",
+    date: "2024",
     image:
-      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1400",
   },
   {
-    year: "2018",
-    title: "Technological Leap",
+    id: "03",
+    title: "Top 5% Global Coding",
     description:
-      "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur.",
+      "Ranked in the top 5% among 10,000+ participants in a global competitive programming championship.",
+    category: "COMPETITIVE PROGRAMMING",
+    date: "2024",
     image:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1400",
+  },
+  {
+    id: "04",
+    title: "Best Innovation Award",
+    description:
+      "Awarded for the 'VentureLink' platform at the annual college tech fest for outstanding product vision.",
+    category: "INNOVATION",
+    date: "2023",
+    image:
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1400",
+  },
+  {
+    id: "05",
+    title: "AWS Certified",
+    description:
+      "Successfully cleared the AWS Solutions Architect certification with a distinction score.",
+    category: "CERTIFICATION",
+    date: "2023",
+    image:
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1400",
   },
 ];
 
-export default function Timeline() {
-  // typed the ref
+export default function TimelineDemo() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Cast the utility to an HTMLElement array
-      const sections = gsap.utils.toArray<HTMLElement>(".timeline-section");
+      /* ─────────────────────────────────────────────────────────
+         Header animations — stagger each child element in
+      ───────────────────────────────────────────────────────── */
+      gsap.fromTo(
+        ".tl-header > *",
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          stagger: 0.12,
+          duration: 1.4,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: ".tl-header",
+            start: "top 85%",
+            once: true,
+          },
+        }
+      );
 
-      sections.forEach((section) => {
-        // Cast selectors to HTMLElement to satisfy TypeScript
-        const bgYear = section.querySelector<HTMLElement>(".bg-year");
-        const leftContent = section.querySelector<HTMLElement>(".content-left");
-        const rightContent =
-          section.querySelector<HTMLElement>(".content-right");
-        const centerDot = section.querySelector<HTMLElement>(".center-dot");
+      /* ─────────────────────────────────────────────────────────
+         Spine draw-down — scrubs with scroll
+      ───────────────────────────────────────────────────────── */
+      gsap.fromTo(
+        ".tl-spine",
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: "none",
+          transformOrigin: "top center",
+          scrollTrigger: {
+            trigger: ".tl-wrapper",
+            start: "top 55%",
+            end: "bottom 55%",
+            scrub: 2,
+          },
+        }
+      );
 
-        gsap.set(bgYear, { scale: 0.8, opacity: 0, y: 100 });
-        gsap.set(leftContent, { x: -50, opacity: 0 });
-        gsap.set(rightContent, { x: 50, opacity: 0 });
-        gsap.set(centerDot, { scale: 0, opacity: 0 });
+      /* ─────────────────────────────────────────────────────────
+         Per-item animations
+      ───────────────────────────────────────────────────────── */
+      const items = gsap.utils.toArray<HTMLElement>(".tl-item");
 
+      items.forEach((item) => {
+        const bgYear  = item.querySelector<HTMLElement>(".tl-bg-year");
+        const leftEl  = item.querySelector<HTMLElement>(".tl-left");
+        const rightEl = item.querySelector<HTMLElement>(".tl-right");
+        const dot     = item.querySelector<HTMLElement>(".tl-dot-inner");
+        const ring    = item.querySelector<HTMLElement>(".tl-dot-ring");
+        const imgEl   = item.querySelector<HTMLElement>(".tl-img");
+        const tagEl   = item.querySelector<HTMLElement>(".tl-tag");
+        const lineEl  = item.querySelector<HTMLElement>(".tl-accent-line");
+        const numEl   = item.querySelector<HTMLElement>(".tl-num");
+        const titleEl = item.querySelector<HTMLElement>(".tl-title");
+        const descEl  = item.querySelector<HTMLElement>(".tl-desc");
+        const scanEl  = item.querySelector<HTMLElement>(".tl-scan");
+
+        /* Initial states */
+        gsap.set([leftEl, rightEl], { autoAlpha: 0 });
+        gsap.set(leftEl,  { x: -60 });
+        gsap.set(rightEl, { x: 60 });
+        gsap.set(bgYear,  { y: 60, autoAlpha: 0 });
+        gsap.set(dot,     { scale: 0, autoAlpha: 0 });
+        gsap.set(ring,    { scale: 0, autoAlpha: 0 });
+        gsap.set(tagEl,   { y: 16, autoAlpha: 0 });
+        gsap.set(lineEl,  { scaleX: 0, autoAlpha: 0, transformOrigin: "left center" });
+        gsap.set(numEl,   { y: 30, autoAlpha: 0 });
+        gsap.set(titleEl, { y: 24, autoAlpha: 0 });
+        gsap.set(descEl,  { y: 18, autoAlpha: 0 });
+        gsap.set(scanEl,  { scaleX: 0, autoAlpha: 0, transformOrigin: "left center" });
+
+        /* ── Enter timeline — scrub-linked ─────────────────── */
         const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: section,
-            start: "top 75%",
-            end: "center center",
-            scrub: 1,
+            trigger: item,
+            start: "top 82%",
+            end: "top 20%",
+            scrub: 2.2,
           },
         });
 
-        tl.to(bgYear, {
-          scale: 1,
-          opacity: 0.15,
-          y: 0,
-          duration: 1,
-          ease: "power2.out",
-        })
-          .to(
-            centerDot,
-            { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" },
-            "<0.2",
-          )
-          .to(
-            leftContent,
-            { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-            "<0.1",
-          )
-          .to(
-            rightContent,
-            { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-            "<",
-          );
+        tl
+          .to(bgYear,  { y: 0, autoAlpha: 1, ease: "power3.out", duration: 1.2 }, 0)
+          .to(dot,     { scale: 1, autoAlpha: 1, ease: "back.out(3)", duration: 0.6 }, 0.05)
+          .to(ring,    { scale: 1, autoAlpha: 1, ease: "expo.out", duration: 1 }, 0.1)
+          .to(leftEl,  { x: 0, autoAlpha: 1, ease: "expo.out", duration: 1.4 }, 0.05)
+          .to(rightEl, { x: 0, autoAlpha: 1, ease: "expo.out", duration: 1.4 }, 0.18)
+          .to(tagEl,   { y: 0, autoAlpha: 1, ease: "power4.out", duration: 0.8 }, 0.12)
+          .to(lineEl,  { scaleX: 1, autoAlpha: 1, ease: "power3.out", duration: 0.7 }, 0.22)
+          .to(numEl,   { y: 0, autoAlpha: 1, ease: "power4.out", duration: 0.9 }, 0.14)
+          .to(titleEl, { y: 0, autoAlpha: 1, ease: "power4.out", duration: 0.9 }, 0.22)
+          .to(descEl,  { y: 0, autoAlpha: 1, ease: "power3.out", duration: 0.9 }, 0.3)
+          .to(scanEl,  { scaleX: 1, autoAlpha: 0.6, ease: "power2.out", duration: 0.5 }, 0.08);
 
-        gsap.to(section, {
-          opacity: 0.2,
+        /* ── Exit — gentle fade ─────────────────────────────── */
+        gsap.to(item, {
+          autoAlpha: 0.25,
           scrollTrigger: {
-            trigger: section,
-            start: "bottom 40%",
-            end: "bottom top",
-            scrub: true,
+            trigger: item,
+            start: "bottom 38%",
+            end: "bottom 8%",
+            scrub: 2,
           },
         });
+
+        /* ── Image parallax ─────────────────────────────────── */
+        if (imgEl) {
+          gsap.fromTo(
+            imgEl,
+            { yPercent: -10 },
+            {
+              yPercent: 10,
+              ease: "none",
+              scrollTrigger: {
+                trigger: item,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.5,
+              },
+            }
+          );
+        }
+
+        /* ── Bg-year text parallax ──────────────────────────── */
+        if (bgYear) {
+          gsap.fromTo(
+            bgYear,
+            { yPercent: -15 },
+            {
+              yPercent: 15,
+              ease: "none",
+              scrollTrigger: {
+                trigger: item,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1,
+              },
+            }
+          );
+        }
       });
     }, containerRef);
 
@@ -114,52 +216,270 @@ export default function Timeline() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full bg-[#0a1118] text-white font-sans overflow-hidden py-32"
+      className="tl-wrapper relative w-full overflow-hidden"
+      style={{
+        /* Subtle dark-section feel — slightly lighter than pure black,
+           fading in from the surrounding page */
+        background:
+          "linear-gradient(to bottom, transparent 0%, rgba(8,8,10,0.92) 6%, rgba(8,8,10,0.96) 94%, transparent 100%)",
+      }}
     >
-      <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-600 md:-translate-x-1/2 z-0 opacity-50" />
+      {/* ── Ambient edge glow strips ──────────────────────────────── */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 40% at 10% 50%, rgba(255,255,255,0.025) 0%, transparent 70%), radial-gradient(ellipse 70% 40% at 90% 50%, rgba(255,255,255,0.018) 0%, transparent 70%)",
+        }}
+      />
 
-      {timelineData.map((item, index) => (
-        <section
-          key={index}
-          className="timeline-section relative min-h-screen flex items-center justify-center py-24 px-6 md:px-12 w-full max-w-7xl mx-auto"
+      {/* ── Section header ──────────────────────────────────────── */}
+      <div className="tl-header relative z-30 text-center pt-28 pb-24 px-6">
+        <p className="text-[10px] font-secondary font-semibold tracking-[0.35em] uppercase text-white/25 mb-5">
+          Our Journey
+        </p>
+        <h2 className="text-5xl sm:text-6xl md:text-7xl font-primary text-white tracking-tight leading-[1]">
+          HISTORY &amp;
+          <br />
+          <span className="text-white/40">ACHIEVEMENTS</span>
+        </h2>
+        {/* Decorative divider */}
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <div className="h-px flex-1 max-w-[80px] bg-gradient-to-r from-transparent to-white/20" />
+          <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
+          <div className="h-px flex-1 max-w-[80px] bg-gradient-to-l from-transparent to-white/20" />
+        </div>
+      </div>
+
+      {/* ── Vertical spine ──────────────────────────────────────── */}
+      <div className="absolute left-1/2 top-0 bottom-0 w-[1px] -translate-x-1/2 z-20 pointer-events-none">
+        {/* Ghost dashes */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(to bottom, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 6px, transparent 6px, transparent 14px)",
+          }}
+        />
+        {/* Scroll-driven fill */}
+        <div
+          className="tl-spine absolute inset-0 origin-top"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0.15))",
+          }}
+        />
+      </div>
+
+      {/* ── Timeline items ──────────────────────────────────────── */}
+      {achievements.map((item, idx) => {
+        const isEven = idx % 2 === 0;
+
+        return (
+          <div
+            key={item.id}
+            className="tl-item relative w-full min-h-[80vh] flex items-center py-16"
+          >
+            {/* Horizontal scan line — subtle */}
+            <div className="tl-scan absolute left-0 right-0 h-px z-10 pointer-events-none"
+              style={{ top: "50%", background: "linear-gradient(to right, transparent 0%, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 70%, transparent 100%)" }}
+            />
+
+            {/* Giant parallax year */}
+            <div className="tl-bg-year absolute inset-0 flex items-center justify-center z-0 pointer-events-none overflow-hidden select-none">
+              <span
+                className="font-primary font-black leading-none tracking-tighter"
+                style={{
+                  fontSize: "clamp(120px, 28vw, 380px)",
+                  color: "transparent",
+                  WebkitTextStroke: "1px rgba(255,255,255,0.05)",
+                  letterSpacing: "-0.04em",
+                }}
+              >
+                {item.date}
+              </span>
+            </div>
+
+            {/* Center dot */}
+            <div className="tl-dot absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none flex items-center justify-center">
+              {/* Animated glow ring */}
+              <div
+                className="tl-dot-ring absolute w-10 h-10 rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)" }}
+              />
+              {/* Core dot */}
+              <div
+                className="tl-dot-inner w-3 h-3 rounded-full bg-white"
+                style={{ boxShadow: "0 0 0 3px rgba(0,0,0,1), 0 0 0 4px rgba(255,255,255,0.4), 0 0 20px 4px rgba(255,255,255,0.18)" }}
+              />
+            </div>
+
+            {/* Content grid */}
+            <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-0 px-6 md:px-16">
+
+              {/* LEFT */}
+              <div
+                className={`tl-left flex flex-col justify-center ${
+                  isEven
+                    ? "md:pr-24 md:items-end md:text-right"
+                    : "md:pl-24 md:order-2"
+                }`}
+              >
+                {isEven ? (
+                  <TextBlock item={item} align="right" />
+                ) : (
+                  <ImageBlock item={item} />
+                )}
+              </div>
+
+              {/* RIGHT */}
+              <div
+                className={`tl-right flex flex-col justify-center ${
+                  isEven ? "md:pl-24" : "md:pr-24 md:items-end md:text-right md:order-1"
+                }`}
+              >
+                {isEven ? (
+                  <ImageBlock item={item} />
+                ) : (
+                  <TextBlock item={item} align="left" />
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Bottom breathing room */}
+      <div className="h-24" />
+    </div>
+  );
+}
+
+/* ─── Text block ─────────────────────────────────────────────────────── */
+function TextBlock({
+  item,
+  align,
+}: {
+  item: (typeof achievements)[0];
+  align: "left" | "right";
+}) {
+  const right = align === "right";
+  return (
+    <div className={`flex flex-col gap-4 ${right ? "items-end" : "items-start"}`}>
+
+      {/* Category tag */}
+      <span
+        className="tl-tag text-[9px] font-secondary font-semibold tracking-[0.3em] uppercase px-3 py-[5px] border"
+        style={{
+          color: "rgba(255,255,255,0.45)",
+          borderColor: "rgba(255,255,255,0.1)",
+          background: "rgba(255,255,255,0.03)",
+        }}
+      >
+        {item.category}
+      </span>
+
+      {/* Year number — huge */}
+      <h3
+        className="tl-num font-primary text-[clamp(4rem,10vw,9rem)] text-white tracking-tighter leading-none"
+      >
+        {item.date}
+      </h3>
+
+      {/* Accent line */}
+      <div
+        className={`tl-accent-line h-[1px] w-16 ${right ? "self-end" : "self-start"}`}
+        style={{
+          background: right
+            ? "linear-gradient(to left, rgba(255,255,255,0.6), transparent)"
+            : "linear-gradient(to right, rgba(255,255,255,0.6), transparent)",
+        }}
+      />
+
+      {/* Title */}
+      <h4 className="tl-title font-primary text-2xl md:text-[1.75rem] text-white leading-snug tracking-tight max-w-xs">
+        {item.title}
+      </h4>
+
+      {/* Description */}
+      <p className="tl-desc font-secondary text-sm text-white/40 leading-[1.8] max-w-[320px]">
+        {item.description}
+      </p>
+
+      {/* Serial */}
+      <span
+        className="font-secondary text-[10px] tracking-[0.25em] mt-2"
+        style={{ color: "rgba(255,255,255,0.15)" }}
+      >
+        — {item.id} / {String(achievements.length).padStart(2, "0")}
+      </span>
+    </div>
+  );
+}
+
+/* ─── Image block ────────────────────────────────────────────────────── */
+function ImageBlock({ item }: { item: (typeof achievements)[0] }) {
+  return (
+    <div
+      className="relative w-full aspect-[4/3] overflow-hidden"
+      style={{
+        /* Subtle white border with glow */
+        outline: "1px solid rgba(255,255,255,0.08)",
+        boxShadow:
+          "0 0 0 1px rgba(255,255,255,0.04), 0 24px 80px -20px rgba(0,0,0,0.8)",
+      }}
+    >
+      {/* Gradient vignettes */}
+      <div className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(8,8,10,0.4) 0%, transparent 30%, transparent 60%, rgba(8,8,10,0.7) 100%)",
+        }}
+      />
+      {/* Left-right vignette */}
+      <div className="absolute inset-0 z-10 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to right, rgba(8,8,10,0.35) 0%, transparent 25%, transparent 75%, rgba(8,8,10,0.35) 100%)",
+        }}
+      />
+
+      {/* Grain texture */}
+      <div
+        className="absolute inset-0 z-10 pointer-events-none opacity-30 mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          backgroundSize: "160px 160px",
+        }}
+      />
+
+      {/* Image */}
+      <img
+        src={item.image}
+        alt={item.title}
+        className="tl-img absolute inset-0 w-full h-full object-cover scale-[1.15] grayscale"
+        style={{ opacity: 0.75 }}
+        referrerPolicy="no-referrer"
+      />
+
+      {/* Corner labels */}
+      <div className="absolute top-3 right-3 z-20">
+        <span
+          className="font-secondary text-[9px] tracking-[0.22em] uppercase"
+          style={{ color: "rgba(255,255,255,0.3)" }}
         >
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden z-0">
-            <span className="bg-year text-[35vw] font-black text-slate-400 blur-[8px] select-none tracking-tighter mix-blend-overlay">
-              {item.year}
-            </span>
-          </div>
-
-          <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-12 md:gap-24">
-            <div className="content-left flex-1 w-full pl-12 md:pl-0 text-left md:text-right">
-              <h2 className="text-6xl md:text-8xl font-bold mb-2 tracking-tight">
-                {item.year}
-              </h2>
-              <div className="flex flex-col md:items-end">
-                <div className="w-16 h-1 bg-blue-500 mb-6 md:ml-auto" />
-                <h3 className="text-2xl md:text-3xl text-slate-200 font-medium mb-4">
-                  {item.title}
-                </h3>
-                <p className="text-slate-400 max-w-md text-base md:text-lg leading-relaxed md:ml-auto">
-                  {item.description}
-                </p>
-              </div>
-            </div>
-
-            <div className="center-dot absolute left-[22px] md:left-1/2 w-4 h-4 rounded-full bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.8)] z-20 -translate-x-1/2 ring-4 ring-[#0a1118]" />
-
-            <div className="content-right flex-1 w-full pl-12 md:pl-0">
-              <div className="relative w-full aspect-[4/3] md:aspect-video rounded-sm overflow-hidden shadow-2xl border border-slate-800/50">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#0a1118]/60 via-transparent to-transparent z-10" />
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="object-cover w-full h-full transform scale-105 transition-transform duration-1000 hover:scale-100"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-      ))}
+          {item.id}
+        </span>
+      </div>
+      <div className="absolute bottom-3 left-3 z-20">
+        <span
+          className="font-secondary text-[9px] tracking-[0.22em] uppercase"
+          style={{ color: "rgba(255,255,255,0.28)" }}
+        >
+          {item.category}
+        </span>
+      </div>
     </div>
   );
 }
