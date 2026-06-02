@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/dist/ScrollTrigger";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { gsap, ScrollTrigger } from "@/lib/gsap";
 
 const achievements = [
   {
@@ -97,7 +92,7 @@ export default function TimelineDemo() {
           ease: "none",
           transformOrigin: "top center",
           scrollTrigger: {
-            trigger: ".tl-wrapper",
+            trigger: containerRef.current,
             start: "top 55%",
             end: "bottom 55%",
             scrub: 2,
@@ -144,7 +139,7 @@ export default function TimelineDemo() {
             trigger: item,
             start: "top 82%",
             end: "top 20%",
-            scrub: 2.2,
+            scrub: 1,
           },
         });
 
@@ -168,7 +163,7 @@ export default function TimelineDemo() {
             trigger: item,
             start: "bottom 38%",
             end: "bottom 8%",
-            scrub: 2,
+            scrub: 1,
           },
         });
 
@@ -184,7 +179,7 @@ export default function TimelineDemo() {
                 trigger: item,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: 1.5,
+                scrub: 0.5,
               },
             }
           );

@@ -34,7 +34,7 @@ const Navbar = () => {
   ];
 
   return (
-    <div className="flex fixed z-[300] top-0 w-screen py-4 px-8 lg:px-14 justify-between bg-[#0000] backdrop-blur-2xl items-center overflow-hidden text-white">
+    <div className="flex fixed z-[300] top-0 w-screen py-4 px-8 lg:px-14 justify-between bg-black/50 lg:bg-[#000000] backdrop-blur-2xl lg:backdrop-blur-none items-center overflow-hidden text-white">
       {/* Logo */}
       <Link href={"/"} className="font-bold text-2xl">
         <img className="h-10" src="/Catalyst_Logo_Navbar.png" alt="" />

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import NowHappening from "@/components/home/NowHappening";
 
 
 
@@ -156,30 +157,13 @@ const Events = () => {
   const past = mockEvents.filter((e) => !e.is_featured);
 
   return (
-    <div className="sm:mx-5 md:mx-10 lg:mx-15 sm:mb-10 mx-5 mb-5">
-      <div className="relative h-[50vh] flex items-center justify-center font-primary text-white overflow-hidden">
-        <h1 className="absolute text-5xl opacity-10 select-none sm:text-7xl md:text-8xl lg:text-9xl">
-          CATALYST
-        </h1>
-        <p className="relative text-xl tracking-wide sm:text-2xl md:text-3xl lg:text-4xl">
-          NOW HAPPENING
+    <div className="sm:mb-10 mb-5">
+      <div className="sm:mx-5 md:mx-10 lg:mx-15 mx-5">
+        <NowHappening />
+
+        <p className="text-lg tracking-wide text-white font-primary text-center mt-30 mb-5 md:text-left md:text-3xl md:mb-7 md:mt-25">
+          PAST EXPERIENCES
         </p>
-      </div>
-
-      {featured && (
-        <>
-          <div className="mx-5 md:hidden">
-            <Card event={featured} />
-          </div>
-          <div className="hidden md:block">
-            <CardDesktop event={featured} />
-          </div>
-        </>
-      )}
-
-      <p className="text-lg tracking-wide text-white font-primary text-center mt-30 mb-5 md:text-left md:text-3xl md:mb-7 md:mt-25">
-        PAST EXPERIENCES
-      </p>
 
       {/* ✅ UNIQUE KEY FIX */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:mr-40 lg:grid-cols-3">
@@ -188,6 +172,7 @@ const Events = () => {
         ))}
       </div>
     </div>
+     </div>
   );
 };
 
