@@ -158,7 +158,7 @@ const Events = () => {
 
   return (
     <div className="sm:mb-10 mb-5">
-      <div className="sm:mx-5 md:mx-10 lg:mx-15 mx-5">
+      <div className="w-full px-5 sm:px-10 lg:px-20">
         <NowHappening />
 
         <p className="text-lg tracking-wide text-white font-primary text-center mt-30 mb-5 md:text-left md:text-3xl md:mb-7 md:mt-25">
@@ -166,7 +166,7 @@ const Events = () => {
         </p>
 
       {/* ✅ UNIQUE KEY FIX */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:mr-40 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
         {past.map((event, index) => (
           <Card2 key={`${event.$id}-${index}`} event={event} />
         ))}

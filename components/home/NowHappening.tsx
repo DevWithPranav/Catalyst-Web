@@ -36,7 +36,7 @@ const NowHappening = () => {
   }, { scope: container });
 
   return (
-    <div ref={container} className="relative w-full flex flex-col items-center justify-center pt-20 pb-10">
+    <div ref={container} className="relative w-full flex flex-col items-center justify-center pt-40">
       {/* Header & Watermark Container */}
       <WatermarkHeader 
         title="NOW HAPPENING" 

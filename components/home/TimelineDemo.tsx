@@ -233,7 +233,7 @@ export default function TimelineDemo() {
         <p className="text-[10px] font-secondary font-semibold tracking-[0.35em] uppercase text-white/25 mb-5">
           Our Journey
         </p>
-        <h2 className="text-5xl sm:text-6xl md:text-7xl font-primary text-white tracking-tight leading-[1]">
+        <h2 className="text-3xl sm:text-6xl md:text-7xl font-primary text-white tracking-tight leading-[1] break-words hyphens-auto">
           HISTORY &amp;
           <br />
           <span className="text-white/40">ACHIEVEMENTS</span>

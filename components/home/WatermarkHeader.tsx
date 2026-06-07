@@ -14,13 +14,13 @@ const WatermarkHeader: React.FC<WatermarkHeaderProps> = ({
   watermarkClassName = "",
 }) => {
   return (
-    <div className="relative w-full flex items-center justify-center mt-20 md:mt-24 lg:mt-50 mb-8 lg:mb-16">
+    <div className="relative w-full flex items-center justify-center py-12 md:py-20 lg:py-24">
       {/* Watermark Background Wrapper */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0">
         <h1
           className={`nh-watermark text-[15vw] md:text-[12vw] lg:text-[14vw] font-primary font-normal uppercase text-transparent bg-clip-text whitespace-nowrap select-none leading-none tracking-normal ${watermarkClassName}`}
           style={{
-            backgroundImage: "linear-gradient(58.9deg, rgba(41, 41, 41, 0.66) 61.92%, rgba(41, 41, 41, 0) 111.62%)",
+            backgroundImage: "linear-gradient(58.9deg, rgba(61, 61, 61, 0.8) 61.92%, rgba(61, 61, 61, 0) 111.62%)",
             WebkitBackgroundClip: "text",
           }}
         >
