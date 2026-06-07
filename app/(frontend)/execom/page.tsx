@@ -1,11 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
+import WatermarkHeader from "@/components/home/WatermarkHeader";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "@/lib/gsap";
+import localFont from 'next/font/local';
 
+const enigma = localFont({
+  src: "../../../public/fonts/enigma.otf",
+  weight: "100",
+  style: "normal",
+});
 /* ---------------- SKELETON COMPONENTS ---------------- */
 
 const CardSkeleton = () => (
-  <div className="flex flex-col items-center text-center animate-pulse">
+  <div className="execom-card flex flex-col items-center text-center animate-pulse">
     <div className="relative">
       <div className="w-50 h-50 bg-gray-700" />
     </div>
@@ -21,7 +30,7 @@ const CardSkeleton = () => (
 );
 
 const CardSkeletonInvert = () => (
-  <div className="flex flex-col items-center text-center animate-pulse">
+  <div className="execom-card flex flex-col items-center text-center animate-pulse">
     <div className="relative">
       <div className="w-50 h-50 bg-gray-300" />
     </div>
@@ -38,7 +47,7 @@ const CardSkeletonInvert = () => (
 
 /* ---------------- CARD ---------------- */
 
-const Card = ({ invert = false, data = null, loading = true }) => {
+const Card = ({ invert = false, data = null as any, loading = true }) => {
   const bgClass = invert ? "bg-black" : "bg-white";
   const textClass = invert ? "text-black" : "text-white";
 
@@ -47,7 +56,7 @@ const Card = ({ invert = false, data = null, loading = true }) => {
   }
 
   return (
-    <div className={`flex flex-col items-center text-center ${textClass}`}>
+    <div className={`execom-card flex flex-col items-center text-center ${textClass}`}>
       <div className="relative">
         <div className={`${bgClass} w-50 h-50 overflow-hidden`} />
         <div className="absolute bottom-0 left-0">
@@ -85,16 +94,44 @@ const Execom = () => {
   const legacyLeaders = [null, null, null, null];
   const coreTeam = [null, null, null, null, null, null];
 
+  const container = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container.current,
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    tl.fromTo(
+      ".nh-watermark",
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 1, ease: "power3.out" }
+    ).fromTo(
+      ".nh-title",
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+      "-=0.6"
+    ).fromTo(
+      ".execom-card",
+      { y: 40, opacity: 0, scale: 0.98 },
+      { y: 0, opacity: 1, scale: 1, duration: 1, ease: "power3.out", stagger: 0.1 },
+      "-=0.4"
+    );
+  }, { scope: container });
+
   return (
-    <div>
+    <div ref={container}>
       {/* ── HERO TITLE ── */}
-      <div className="relative h-[50vh] flex items-center justify-center font-primary text-white overflow-hidden">
-        <h1 className="absolute text-5xl opacity-10 select-none sm:text-7xl md:text-8xl lg:text-9xl">
-          CATALYST
-        </h1>
-        <p className="relative text-xl tracking-wide sm:text-2xl md:text-3xl lg:text-4xl">
-          THE CATALYST FAMILY
-        </p>
+      <div className="w-full pt-20 lg:pt-40">
+        <WatermarkHeader 
+          title="THE CATALYST FAMILY"
+          watermark="CATALYST"
+          titleClassName={`${enigma.className} nh-title drop-shadow-lg !text-[4vw] md:text-4xl lg:text-5xl`}
+          watermarkClassName={`${enigma.className} nh-watermark tracking-[1em] !text-[12vw] md:!text-[12vw] lg:!text-[12vw]`}
+        />
       </div>
 
       {/* ── FEATURED LEAD ── */}

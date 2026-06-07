@@ -1,13 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "@/lib/gsap";
 
 const Connect = () => {
   const [showModal, setShowModal] = useState(false);
+  const container = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container.current,
+        start: "top 80%",
+        once: true,
+      },
+    });
+
+    tl.fromTo(
+      container.current,
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+    ).fromTo(
+      ".connect-content > *",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power3.out" },
+      "-=0.4"
+    );
+  }, { scope: container });
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -56,7 +80,7 @@ const Connect = () => {
   };
 
   return (
-    <section className="relative mt-35 rounded-xl bg-white text-black overflow-hidden mx-5 md:mx-15 sm:mx-15">
+    <section ref={container} className="relative rounded-2xl bg-white text-black overflow-hidden shadow-xl">
       {/* ✅ Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -81,63 +105,67 @@ const Connect = () => {
         className="pointer-events-none absolute bottom-0 right-0 w-48 z-0"
       />
 
-      <div className="relative z-10 max-w-2xl px-6 py-7 sm:px-12 sm:py-12 text-left">
-        <h2 className="mb-8 text-2xl font-primary md:text-3xl sm:text-4xl sm:w-100">
+      <div className="connect-content relative z-10 p-8 sm:p-10 text-left bg-white/80 backdrop-blur-sm h-full flex flex-col justify-center">
+        <h2 className="mb-8 text-2xl md:text-3xl font-primary font-bold tracking-wide uppercase">
           GET IN TOUCH WITH US
         </h2>
 
         <form className="space-y-6 font-secondary" onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">
-                Full Name<span className="text-red-500">*</span>
+              <Label htmlFor="name" className="font-semibold">
+                Full Name <span className="text-red-500">*</span>
               </Label>
-              <Input id="name" placeholder="Your full name" required />
+              <Input id="name" placeholder="Your Full Name" className="bg-white border-gray-200 placeholder-gray-300 text-sm md:text-base" required />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">
-                Email Address<span className="text-red-500">*</span>
+              <Label htmlFor="email" className="font-semibold">
+                Email Address <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="name@gmail.com"
+                className="bg-white border-gray-200 placeholder-gray-300 text-sm md:text-base"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">
-                Phone Number<span className="text-red-500">*</span>
+              <Label htmlFor="phone" className="font-semibold">
+                Phone Number <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="+91472742747"
+                placeholder="+1555123457"
+                className="bg-white border-gray-200 placeholder-gray-300 text-sm md:text-base"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="subject">
-                Subject<span className="text-red-500">*</span>
+              <Label htmlFor="subject" className="font-semibold">
+                Subject <span className="text-red-500">*</span>
               </Label>
-              <Input id="subject" placeholder="Enter the subject" required />
+              <Input id="subject" placeholder="Enter the Subject" className="bg-white border-gray-200 placeholder-gray-300 text-sm md:text-base" required />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message" className="font-semibold">Message</Label>
             <Textarea
               id="message"
-              placeholder="Tell us how we can help you"
-              className="min-h-[140px] resize-y bg-white text-lg md:text-xl"
+              placeholder="Tell us how we can help you..!"
+              className="min-h-[120px] resize-y bg-white border-gray-200 placeholder-gray-300 text-sm md:text-base"
               required
             />
           </div>
 
-          <Button type="submit">Send Message</Button>
+          <Button type="submit" className="bg-black hover:bg-neutral-800 text-white px-8 py-5 rounded-md font-semibold text-sm">
+            Send Message
+          </Button>
         </form>
       </div>
     </section>
