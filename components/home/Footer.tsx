@@ -62,7 +62,7 @@ const Footer = () => {
 
         {/* Copyright Section */}
         <div className="footer-content flex items-center justify-center text-[10px] md:text-xs text-gray-500 font-secondary z-10 mt-16 md:mt-24">
-          <p>All Rights Reserved © Catalyst IEDC {new Date().getFullYear()}</p>
+          <p>All Rights Reserved © Catalyst IEDC 2026</p>
         </div>
 
         {/* Huge Text Background */}

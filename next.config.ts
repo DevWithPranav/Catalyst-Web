@@ -29,9 +29,10 @@ const nextConfig: NextConfig = {
   },
 
   // ─── Experimental features ───────────────────────────────────────────
+  cacheComponents: true,
   experimental: {
     // Optimize server-component imports (tree-shake large icon bundles)
-    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons", "react-icons"],
   },
 
   // ─── HTTP headers — Cache static assets aggressively ────────────────

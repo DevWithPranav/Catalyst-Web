@@ -16,7 +16,7 @@ const PioneerCard = () => {
       {/* Card body */}
       <div className="relative w-full h-full rounded-3xl bg-gradient-to-b from-[#181818] to-[#0a0a0a] flex flex-col items-center justify-center p-6 text-white">
         <div className="relative w-12 h-12 md:w-16 md:h-16 mb-3">
-          <Image src="/log.png" alt="Unibotix Logo" fill className="object-contain" />
+          <Image src="/log.png" alt="Unibotix Logo" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain" />
         </div>
         <h3 className="font-primary text-sm md:text-lg font-bold">Unibotix</h3>
         <p className="font-secondary text-[8px] md:text-[10px] text-gray-400">Innovations Pvt. Ltd.</p>

@@ -106,6 +106,7 @@ const Connect = () => {
         width={192}
         height={192}
         className="pointer-events-none absolute bottom-0 right-0 w-48 h-auto z-0"
+        style={{ width: 'auto', height: 'auto' }}
       />
 
       <div className="connect-content relative z-10 p-8 sm:p-10 text-left bg-white/80 backdrop-blur-sm h-full flex flex-col justify-center">
