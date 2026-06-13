@@ -6,6 +6,7 @@ import WatermarkHeader from "@/components/home/WatermarkHeader";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import localFont from 'next/font/local';
+import TeamMemberCard from '@/components/TeamMemberCard';
 
 const enigma = localFont({
   src: "../../../public/fonts/enigma.otf",
@@ -49,38 +50,18 @@ const CardSkeletonInvert = () => (
 /* ---------------- CARD ---------------- */
 
 const Card = ({ invert = false, data = null as any, loading = true }) => {
-  const bgClass = invert ? "bg-black" : "bg-white";
-  const textClass = invert ? "text-black" : "text-white";
-
   if (loading) {
     return invert ? <CardSkeletonInvert /> : <CardSkeleton />;
   }
 
   return (
-    <div className={`execom-card flex flex-col items-center text-center ${textClass}`}>
-      <div className="relative">
-        <div className={`${bgClass} w-50 h-50 overflow-hidden`} />
-        <div className="absolute inset-0">
-          <Image
-            src={data?.image ?? "/sab.png"}
-            alt={data?.name ?? ""}
-            fill
-            className="object-contain"
-          />
-        </div>
-      </div>
-      <div className="flex flex-col items-center">
-        <h2 className="font-primary text-2xl mt-5">
-          {data?.name ?? "SABAREESH"}
-        </h2>
-        <p className="font-secondary text-sm">
-          {data?.role ?? "Chief Operations Officer"}
-        </p>
-        <div className="mt-3 flex gap-5">
-          <Image src="/social/insta.svg" alt="Instagram" width={20} height={20} className="w-5 h-5" />
-          <Image src="/social/link.svg" alt="LinkedIn" width={20} height={20} className="w-5 h-5" />
-        </div>
-      </div>
+    <div className="execom-card">
+      <TeamMemberCard
+        name={data?.name ?? "SABAREESH"}
+        role={data?.role ?? "Chief Operations Officer"}
+        image={data?.image ?? "/sab.png"}
+        invert={invert}
+      />
     </div>
   );
 };

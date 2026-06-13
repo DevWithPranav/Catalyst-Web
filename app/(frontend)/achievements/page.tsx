@@ -106,20 +106,20 @@ const Team = () => {
           {/* Left Content */}
           <div className="flex flex-col items-start justify-center p-8 md:p-12 lg:p-16 w-full lg:w-[45%] bg-[#080808]">
             <div className="flex flex-col items-start">
-              <div className="flex items-center gap-[4px] mb-2 tracking-widest">
-                <span className="font-primary text-[10px] md:text-xs text-white uppercase font-bold">LATEST</span>
-                <span className="font-secondary text-[10px] md:text-xs text-white uppercase font-bold">ACHIEVEMENT</span>
+              <div className="flex items-center gap-[6px] mb-2 tracking-widest">
+                <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">LATEST</span>
+                <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">ACHIEVEMENT</span>
               </div>
               
               <div className="w-full h-[1px] bg-zinc-400 mb-4" /> 
               
-              <h3 className="font-primary text-[2rem] sm:text-3xl md:text-4xl lg:text-[2.5rem] text-white leading-tight tracking-wide mb-2">
+              <h3 className="font-primary font-normal text-[2rem] sm:text-3xl md:text-4xl lg:text-[2.5rem] text-white leading-tight tracking-wide mb-2">
                 {featured.title}
               </h3>
               
               <div className="w-full h-[1px] bg-zinc-400 mt-4 mb-4" /> 
               
-              <p className="font-secondary text-sm sm:text-base text-zinc-400 leading-relaxed mb-4">
+              <p className="font-secondary text-sm sm:text-base text-gray-300 leading-relaxed mb-4">
                 {featured.description}
               </p>
             </div>
