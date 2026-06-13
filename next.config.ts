@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig: NextConfig = {
   // Allow hot-reloading on your phone (192.168.1.3) over local network
   allowedDevOrigins: ['192.168.1.3'],
@@ -33,6 +37,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // Optimize server-component imports (tree-shake large icon bundles)
     optimizePackageImports: ["lucide-react", "@radix-ui/react-icons", "react-icons"],
+    viewTransition: true,
   },
 
   // ─── HTTP headers — Cache static assets aggressively ────────────────
@@ -52,4 +57,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

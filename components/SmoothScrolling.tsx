@@ -30,7 +30,6 @@ function SmoothScrolling({ children }: { children: React.ReactNode }) {
         touchMultiplier: 1.2,
         infinite: false,
         wheelMultiplier: 1,
-        overscrollClamp: false,
       }}
     >
       <LenisScrollTriggerSync />
