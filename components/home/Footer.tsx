@@ -40,7 +40,7 @@ const Footer = () => {
         
         {/* Top Section */}
         <div className="footer-content z-10 flex flex-col items-center space-y-6">
-          <h2 className="text-white text-xl md:text-3xl font-primary font-bold tracking-widest uppercase">
+          <h2 className="text-white text-xl md:text-3xl font-primary font-normal tracking-widest uppercase">
             CATALYST MAR BASELIOS IEDC
           </h2>
           
@@ -67,7 +67,7 @@ const Footer = () => {
 
         {/* Huge Text Background */}
         <div className="footer-bg-text w-full flex justify-center mt-auto -mb-[3%] select-none pointer-events-none absolute bottom-0 left-0 right-0 overflow-hidden">
-          <h1 className="text-[15.5vw] leading-[0.75] font-primary font-bold uppercase text-transparent bg-clip-text bg-gradient-to-b from-white/10 to-neutral-900 tracking-tighter whitespace-nowrap text-center w-full">
+          <h1 className="text-[15.5vw] leading-[0.75] font-primary font-normal uppercase text-transparent bg-clip-text bg-gradient-to-b from-white/10 to-neutral-900 tracking-tighter whitespace-nowrap text-center w-full">
             CATALYST
           </h1>
         </div>

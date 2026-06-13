@@ -109,7 +109,7 @@ const Connect = () => {
       />
 
       <div className="connect-content relative z-10 p-8 sm:p-10 text-left bg-white/80 backdrop-blur-sm h-full flex flex-col justify-center">
-        <h2 className="mb-8 text-2xl md:text-3xl font-primary font-bold tracking-wide uppercase">
+        <h2 className="mb-8 text-2xl md:text-3xl font-primary font-normal tracking-wide uppercase">
           GET IN TOUCH WITH US
         </h2>
 

@@ -54,7 +54,7 @@ const NowHappening = () => {
           
           <div className="flex flex-col items-start">
             <div className="flex items-center gap-[4px] mb-2 tracking-widest">
-              <span className="font-primary text-[10px] md:text-xs text-white uppercase font-bold">CATALYST</span>
+              <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">CATALYST</span>
               <span className="font-secondary text-[10px] md:text-xs text-white uppercase font-bold">IEDC</span>
             </div>
             

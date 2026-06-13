@@ -284,7 +284,7 @@ export default function TimelineDemo() {
             {/* Giant parallax year */}
             <div className="tl-bg-year absolute inset-0 flex items-center justify-center z-0 pointer-events-none overflow-hidden select-none">
               <span
-                className="font-primary font-black leading-none tracking-tighter"
+                className="font-primary font-normal leading-none tracking-tighter"
                 style={{
                   fontSize: "clamp(120px, 28vw, 380px)",
                   color: "transparent",

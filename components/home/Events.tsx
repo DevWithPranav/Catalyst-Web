@@ -68,7 +68,7 @@ const Events = () => {
 
   return (
     <div ref={container} className="text-white mx-5 md:px-9 sm:mx-15 lg:mt-60 overflow-hidden">
-      <h1 className="event-header text-3xl font-primary mt-20 mb-6 md:text-4xl sm:text-4xl font-bold tracking-widest uppercase">
+      <h1 className="event-header text-3xl font-primary mt-20 mb-6 md:text-4xl sm:text-4xl font-normal tracking-widest uppercase">
         THE EVENTS
       </h1>
       <p className="event-desc text-left font-secondary mb-10 leading-relaxed md:text-lg sm:text-lg text-gray-300 max-w-5xl">

@@ -2,7 +2,7 @@ import React from "react";
 import localFont from "next/font/local";
 
 const monument = localFont({
-  src: "../../public/fonts/MonumentExtended-Regular.otf",
+  src: "../../public/fonts/MonumentExtended-Ultrabold.otf",
   display: "swap",
 });
 

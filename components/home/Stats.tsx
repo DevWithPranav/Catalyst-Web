@@ -30,7 +30,7 @@ const Stats = () => {
 
   return (
     <div ref={container} className="sm:px-15 lg:mt-60 overflow-hidden">
-      <h1 className="stat-header text-3xl text-center text-white font-primary mx-5 mt-27 mb-10 md:mb-1 md:text-4xl sm:text-4xl tracking-widest uppercase font-bold">
+      <h1 className="stat-header text-3xl text-center text-white font-primary mx-5 mt-27 mb-10 md:mb-1 md:text-4xl sm:text-4xl tracking-widest uppercase font-normal">
         CATALYST MATRIX
       </h1>
       <div className="mx-8 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-7 md:p-9 sm:grid-cols-2 lg:grid-cols-3">
