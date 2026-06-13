@@ -96,6 +96,7 @@ const NowHappening = () => {
             src="/log.png" 
             alt="Inceptra VIII Event" 
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover grayscale opacity-75"
           />
         </div>

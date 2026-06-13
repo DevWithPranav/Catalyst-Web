@@ -21,7 +21,7 @@ const mockEvents = [
   {
     $id: "2",
     title: "Design Sprint",
-    cover_image: "/event2.jpg",
+    cover_image: "/featured.jpg",
     start_date: "Jan 5",
     end_date: "Jan 6",
     is_featured: false,
@@ -29,7 +29,7 @@ const mockEvents = [
   {
     $id: "3",
     title: "Prototype Jam",
-    cover_image: "/event2.jpg",
+    cover_image: "/featured.jpg",
     start_date: "Jan 10",
     end_date: "Jan 11",
     is_featured: false,
@@ -37,7 +37,7 @@ const mockEvents = [
   {
     $id: "4",
     title: "Startup Meetup",
-    cover_image: "/event2.jpg",
+    cover_image: "/featured.jpg",
     start_date: "Jan 15",
     end_date: "Jan 16",
     is_featured: false,
@@ -45,7 +45,7 @@ const mockEvents = [
   {
     $id: "5",
     title: "Hackathon",
-    cover_image: "/event2.jpg",
+    cover_image: "/featured.jpg",
     start_date: "Jan 20",
     end_date: "Jan 21",
     is_featured: false,
