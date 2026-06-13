@@ -125,7 +125,7 @@ const CampusSnapshot = () => {
                       src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop"
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      alt={name.replace('\n', ' ')}
+                      alt={name.replace(/\n/g, ' ')}
                       className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
                     />
                   </div>
