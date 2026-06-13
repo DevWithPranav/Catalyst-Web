@@ -6,7 +6,8 @@ import localFont from "next/font/local";
 import Image from "next/image";
 
 const enigmaFont = localFont({
-  src: "../../../public/fonts/enigma.otf",
+  src: "../../../public/fonts/MonumentExtended-Ultrabold.otf",
+  display: "swap",
 });
 
 const snapshotData = [
@@ -62,27 +63,25 @@ const CampusSnapshot = () => {
             </div>
           </div>
 
-          <div className="relative mt-4 md:mt-8 w-full pl-4 md:pl-8">
-            <div className="flex flex-col gap-12 md:gap-16 relative z-10">
+          <div className="relative mt-4 md:mt-8 w-full">
+            {/* Vertical connecting line */}
+            <div className="snapshot-line absolute left-[17px] md:left-[21px] top-5 bottom-5 w-1 bg-white/30 origin-top z-0" />
+
+            <div className="flex flex-col gap-10 md:gap-14 relative z-10">
               {snapshotData.map((item, index) => (
-                <div key={index} className="snapshot-item relative flex items-center gap-8 md:gap-10 group">
-                  
-                  {/* Connecting Line (Only draw if not the last item) */}
-                  {index !== snapshotData.length - 1 && (
-                    <div className="absolute left-[18px] md:left-[22px] top-[50%] w-[4px] h-[calc(100%+3rem)] md:h-[calc(100%+4rem)] bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)] snapshot-line origin-top z-0" />
-                  )}
+                <div key={index} className="snapshot-item relative flex items-start gap-6 md:gap-8 group">
 
                   {/* Timeline Node */}
-                  <div className="relative z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#050505] flex items-center justify-center border-2 border-white/40 text-white shrink-0 shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:border-white transition-colors duration-300">
-                    <span className={`text-sm md:text-base ${enigmaFont.className}`}>μ</span>
+                  <div className="relative z-10 w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#0a0a0a] flex items-center justify-center border border-white/30 text-white shrink-0 group-hover:border-white transition-colors duration-300">
+                    <span className={`text-sm md:text-base ${enigmaFont.className} [text-shadow:-1.5px_0_0_#0ff,1.5px_0_0_#f00]`}>μ</span>
                   </div>
-                  
+
                   {/* Content */}
-                  <div className="flex flex-col">
-                    <span className={`${enigmaFont.className} font-normal text-white text-base md:text-lg mb-1 drop-shadow-md tracking-tight`}>
+                  <div className="flex flex-col pt-1">
+                    <span className="font-mono text-white/50 text-xs md:text-sm mb-1 tracking-wider">
                       {item.label}
                     </span>
-                    <span className={`font-bold text-white text-2xl md:text-[32px] uppercase leading-tight drop-shadow-lg tracking-wide whitespace-pre-line ${enigmaFont.className}`}>
+                    <span className={`text-white text-2xl md:text-[36px] uppercase leading-tight tracking-wide whitespace-pre-line ${enigmaFont.className}`}>
                       {item.value}
                     </span>
                   </div>
@@ -109,38 +108,39 @@ const CampusSnapshot = () => {
             20
           </div>
 
-          <div className="grid grid-cols-6 gap-x-6 gap-y-12 md:gap-x-10 md:gap-y-16 relative z-10">
+          {/* All 20 ranks in a unified grid */}
+          <div className="grid grid-cols-6 gap-x-6 md:gap-x-10 gap-y-8 md:gap-y-12 relative z-10">
             {Array.from({ length: 20 }, (_, i) => {
               const rank = i + 1;
-              const name = rank === 1 ? "VEDHA MAHADEVAN" : (rank === 4 ? "AGNIVESH\nPS" : "CHRIS THOMAS\nABRAHAM");
-              
               const isTop2 = rank <= 2;
+              const name = rank === 1 ? "VEDHA MAHADEVAN" : rank === 4 ? "AGNIVESH\nPS" : "CHRIS THOMAS\nABRAHAM";
 
               return (
-                <div 
-                  key={rank} 
-                  className={`flex items-start gap-4 ${isTop2 ? 'md:gap-8 col-span-6 lg:col-span-3' : 'md:gap-4 col-span-6 sm:col-span-3 lg:col-span-2'}`}
+                <div
+                  key={rank}
+                  className={`flex items-start gap-3 md:gap-5 ${isTop2 ? 'col-span-6 lg:col-span-3' : 'col-span-6 sm:col-span-3 lg:col-span-2'}`}
                 >
-                  <div className={`relative shrink-0 bg-white/10 w-20 h-20 ${isTop2 ? 'md:w-36 md:h-36' : ''}`}>
-                    <Image 
-                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" 
-                      fill 
-                      alt={name.replace('\n', ' ')} 
-                      className="object-cover grayscale hover:grayscale-0 transition-all duration-500" 
+                  {/* Avatar */}
+                  <div className={`relative shrink-0 bg-white/10 ${isTop2 ? 'w-20 h-20 md:w-[130px] md:h-[130px]' : 'w-16 h-16 md:w-[110px] md:h-[120px]'}`}>
+                    <Image
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop"
+                      fill
+                      alt={name.replace('\n', ' ')}
+                      className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
                     />
                   </div>
-                  
-                  <div className="flex flex-col text-white pt-1 overflow-hidden">
-                    <div className={`leading-none mb-1 text-white tracking-wide ${enigmaFont.className} text-3xl ${isTop2 ? 'md:text-[44px]' : 'md:text-3xl'}`}>
+                  {/* Text */}
+                  <div className="flex flex-col text-white overflow-hidden min-w-0">
+                    <div className={`leading-none tracking-wide ${enigmaFont.className} ${isTop2 ? 'text-3xl md:text-[40px]' : 'text-2xl md:text-[34px]'}`}>
                       #{rank}
                     </div>
-                    <div className={`uppercase leading-[1.1] whitespace-pre-line tracking-wide ${enigmaFont.className} text-sm ${isTop2 ? 'md:text-[22px] mt-1' : 'md:text-base'}`}>
+                    <div className={`uppercase leading-[1.15] whitespace-pre-line tracking-wide ${enigmaFont.className} mt-1 ${isTop2 ? 'text-base md:text-[20px]' : 'text-xs md:text-[15px]'}`}>
                       {name}
                     </div>
-                    <div className={`text-white/80 ${enigmaFont.className} mt-1 tracking-tight truncate text-[10px] ${isTop2 ? 'md:text-[14px]' : 'md:text-xs'}`}>
+                    <div className={`text-white/70 font-mono mt-0.5 tracking-tight truncate ${isTop2 ? 'text-[10px] md:text-[13px]' : 'text-[9px] md:text-[12px]'}`}>
                       christhomasabraham@mulearn
                     </div>
-                    <div className={`leading-none tracking-wider ${enigmaFont.className} text-2xl mt-2 ${isTop2 ? 'md:text-[40px] md:mt-4' : 'md:text-2xl md:mt-2'}`}>
+                    <div className={`leading-none tracking-wider ${enigmaFont.className} mt-1.5 ${isTop2 ? 'text-2xl md:text-[36px]' : 'text-xl md:text-[30px]'}`}>
                       70122
                     </div>
                   </div>

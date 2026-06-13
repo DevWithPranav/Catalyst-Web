@@ -6,9 +6,14 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
 const enigma = localFont({
-  src: "../../../../public/fonts/enigma.otf",
+  src: "../../../../public/fonts/MonumentExtended-Ultrabold.otf",
   weight: "100",
   style: "normal",
+});
+
+const poppins = localFont({
+  src: "../../../../public/fonts/Poppins-Regular.ttf",
+  display: "swap",
 });
 
 const muLearnAchievementsData = [
@@ -57,10 +62,10 @@ const Card = ({ year, title, description, image }: any) => {
         <h1 className={`${enigma.className} text-3xl sm:text-4xl md:text-[40px] mb-2 text-white`}>
           {year}
         </h1>
-        <p className={`${enigma.className} text-base sm:text-lg md:text-xl font-semibold mb-3 text-white`}>
+        <p className={`${poppins.className} text-base sm:text-lg md:text-xl font-semibold mb-3 text-white`}>
           {title}
         </p>
-        <p className={`${enigma.className} text-sm sm:text-base md:text-[15px] font-normal text-zinc-400 text-pretty leading-relaxed`}>
+        <p className={`${poppins.className} text-sm sm:text-base md:text-[15px] font-normal text-zinc-400 text-pretty leading-relaxed`}>
           {description}
         </p>
       </div>
@@ -128,13 +133,13 @@ const MuLearnAchievements = () => {
               
               <div className="w-full h-[1px] bg-zinc-400 mb-3" /> 
               
-              <h3 className={`${enigma.className} text-2xl sm:text-3xl md:text-4xl text-white leading-tight tracking-wide mb-2`}>
+              <h3 className={`${poppins.className} text-2xl sm:text-3xl md:text-4xl text-white leading-tight tracking-wide mb-2`}>
                 {featured.title}
               </h3>
               
               <div className="w-full h-[1px] bg-zinc-400 mt-3 mb-3" /> 
               
-              <p className={`${enigma.className} text-xs sm:text-sm md:text-base text-zinc-400 leading-relaxed mb-2`}>
+              <p className={`${poppins.className} text-xs sm:text-sm md:text-base text-zinc-400 leading-relaxed mb-2`}>
                 {featured.description}
               </p>
             </div>
