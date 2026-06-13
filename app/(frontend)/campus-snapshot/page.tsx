@@ -6,7 +6,7 @@ import localFont from "next/font/local";
 import Image from "next/image";
 
 const enigmaFont = localFont({
-  src: "../../../public/fonts/MonumentExtended-Ultrabold.otf",
+  src: "../../../public/fonts/enigma.otf",
   display: "swap",
 });
 
@@ -57,15 +57,14 @@ const CampusSnapshot = () => {
               CAMPUS SNAPSHOT
             </h1>
             
-            <div className={`flex items-center gap-3 text-gray-400 ${enigmaFont.className} text-sm md:text-base`}>
+            <div className={`flex items-center gap-3 text-gray-400 font-secondary text-sm md:text-base`}>
               <div className="w-2 h-2 rounded-full bg-white animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
               Live stats from the MuLearn Foundation Platform
             </div>
           </div>
 
           <div className="relative mt-4 md:mt-8 w-full">
-            {/* Vertical connecting line */}
-            <div className="snapshot-line absolute left-[17px] md:left-[21px] top-5 bottom-5 w-1 bg-white/30 origin-top z-0" />
+            <div className="snapshot-line absolute left-[17px] md:left-[21px] top-5 bottom-5 w-1 bg-white origin-top z-0 shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
 
             <div className="flex flex-col gap-10 md:gap-14 relative z-10">
               {snapshotData.map((item, index) => (

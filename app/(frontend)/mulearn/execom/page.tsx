@@ -45,8 +45,8 @@ const MuLearnExecom = () => {
       <WatermarkHeader 
         title="MULEARN WORKFORCE"
         watermark="MULEARN"
-        titleClassName={`${enigma.className} nh-title drop-shadow-lg !text-[4vw] md:text-4xl lg:text-5xl`}
-        watermarkClassName={`${enigma.className} nh-watermark tracking-[1em] !text-[12vw] md:!text-[12vw] lg:!text-[12vw]`}
+        titleClassName={`font-primary font-extrabold nh-title drop-shadow-lg !text-[4vw] md:text-4xl lg:text-5xl`}
+        watermarkClassName={`font-primary font-extrabold nh-watermark tracking-[1em] !text-[12vw] md:!text-[12vw] lg:!text-[12vw]`}
       />
 
       <div className="w-full px-5 sm:px-10 lg:px-20 relative z-10 flex flex-col items-center mt-16 md:mt-24">

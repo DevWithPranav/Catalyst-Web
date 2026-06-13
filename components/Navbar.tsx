@@ -22,6 +22,7 @@ const NAV_LINKS: NavLink[] = [
     subLinks: [
       { page: "Execom", path: "/mulearn/execom" },
       { page: "Achievements", path: "/mulearn/achievements" },
+      { page: "Campus Snapshot", path: "/campus-snapshot" },
     ],
   },
   { page: "Gallery", path: "/gallery" },
