@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 import WatermarkHeader from "@/components/home/WatermarkHeader";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
@@ -59,11 +60,12 @@ const Card = ({ invert = false, data = null as any, loading = true }) => {
     <div className={`execom-card flex flex-col items-center text-center ${textClass}`}>
       <div className="relative">
         <div className={`${bgClass} w-50 h-50 overflow-hidden`} />
-        <div className="absolute bottom-0 left-0">
-          <img
+        <div className="absolute inset-0">
+          <Image
             src={data?.image ?? "/sab.png"}
             alt={data?.name ?? ""}
-            className="h-full w-full object-contain"
+            fill
+            className="object-contain"
           />
         </div>
       </div>
@@ -75,8 +77,8 @@ const Card = ({ invert = false, data = null as any, loading = true }) => {
           {data?.role ?? "Chief Operations Officer"}
         </p>
         <div className="mt-3 flex gap-5">
-          <img src="/social/insta.svg" alt="Instagram" className="w-5" />
-          <img src="/social/link.svg" alt="LinkedIn" className="w-5" />
+          <Image src="/social/insta.svg" alt="Instagram" width={20} height={20} className="w-5 h-5" />
+          <Image src="/social/link.svg" alt="LinkedIn" width={20} height={20} className="w-5 h-5" />
         </div>
       </div>
     </div>

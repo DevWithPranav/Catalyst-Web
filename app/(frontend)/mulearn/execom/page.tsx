@@ -30,7 +30,7 @@ const ExecomMember = ({ name, title }: { name: string; title: string }) => {
       <h3 className={`${enigma.className} text-white text-base md:text-xl uppercase tracking-wider mb-1 text-center`}>
         {name}
       </h3>
-      <p className="text-gray-300 font-secondary text-[10px] md:text-xs text-center mb-3 max-w-[180px]">
+      <p className={`text-gray-300 ${enigma.className} text-[10px] md:text-xs text-center mb-3 max-w-[180px]`}>
         {title}
       </p>
       {/* Socials */}

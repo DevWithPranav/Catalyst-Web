@@ -1,6 +1,7 @@
 "use client";
 import WatermarkHeader from "@/components/home/WatermarkHeader";
 import React, { useRef } from "react";
+import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 
@@ -26,10 +27,11 @@ const Card = ({ year, title, description, image }: any) => {
     <div className="ach-card text-white flex flex-col group h-full cursor-pointer">
       {/* Image Container */}
       <div className="relative w-full aspect-video overflow-hidden mb-4 md:mb-6">
-        <img
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        <Image
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
           src={image}
           alt={title}
+          fill
         />
         {/* Subtle overlay on hover */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -127,10 +129,11 @@ const Team = () => {
           <div className="w-full lg:w-[55%] h-64 sm:h-80 lg:h-auto relative bg-[#080808]">
             {/* Fading gradient edge for smooth blend on desktop */}
             <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#080808] via-[#080808]/80 to-transparent z-10" />
-            <img 
+            <Image 
               src={featured.image} 
               alt={featured.title} 
-              className="w-full h-full object-cover grayscale opacity-75"
+              fill
+              className="object-cover grayscale opacity-75"
             />
           </div>
         </div>

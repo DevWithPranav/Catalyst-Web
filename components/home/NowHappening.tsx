@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
@@ -91,10 +92,11 @@ const NowHappening = () => {
         <div className="w-full lg:w-[55%] h-64 sm:h-80 lg:h-auto relative bg-[#080808]">
           {/* Fading gradient edge for smooth blend on desktop */}
           <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#080808] via-[#080808]/80 to-transparent z-10" />
-          <img 
+          <Image 
             src="/log.png" 
             alt="Inceptra VIII Event" 
-            className="w-full h-full object-cover grayscale opacity-75"
+            fill
+            className="object-cover grayscale opacity-75"
           />
         </div>
 

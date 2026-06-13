@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef } from "react";
+import Image from "next/image";
 import EventCard from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
 import { useGSAP } from "@gsap/react";
@@ -20,9 +21,11 @@ const ButtonNew = () => {
   "
     >
       Events
-      <img
+      <Image
         src="/right.svg"
         alt=""
+        width={16}
+        height={16}
         className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 ml-1 w-3 h-3 md:w-4 md:h-4 sm:w-4 sm:h-4"
       />
     </Button>
