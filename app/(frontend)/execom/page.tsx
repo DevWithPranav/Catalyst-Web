@@ -112,8 +112,8 @@ const Execom = () => {
         <WatermarkHeader 
           title="THE CATALYST FAMILY"
           watermark="CATALYST"
-          titleClassName={`${enigma.className} nh-title drop-shadow-lg !text-[4vw] md:text-4xl lg:text-5xl`}
-          watermarkClassName={`${enigma.className} nh-watermark tracking-[1em] !text-[12vw] md:!text-[12vw] lg:!text-[12vw]`}
+          titleClassName={` nh-title drop-shadow-lg !text-[4vw] md:text-4xl lg:text-5xl`}
+          watermarkClassName={` nh-watermark tracking-[1em] !text-[12vw] md:!text-[12vw] lg:!text-[12vw]`}
         />
       </div>
 

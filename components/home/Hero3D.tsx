@@ -14,7 +14,7 @@ const Hero3D = () => {
   return (
     <div ref={containerRef} className={`absolute inset-0 ${!isDesktop ? 'pointer-events-none' : ''}`}>
       <Canvas
-        camera={{ position: [0, -55, 110], fov: isDesktop ? 4 : 10 }}
+        camera={{ position: [0, -55, 110], fov: isDesktop ? 4.5 : 7 }}
         dpr={[1, 1.5]}
         gl={{
           antialias: true,
