@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import NowHappening from "@/components/home/NowHappening";
 
@@ -81,7 +82,7 @@ const ButtonNew = ({ link }: { link?: string }) => (
 /* ---------------- FEATURED CARDS ---------------- */
 
 const CardDesktop = ({ event }: any) => (
-  <div className="relative rounded-2xl p-[0.5px]">
+  <Link href={`/events/${event.slug || event.$id}`} className="block relative rounded-2xl p-[0.5px]">
     <div
       className="absolute inset-0 rounded-2xl"
       style={{
@@ -112,11 +113,11 @@ const CardDesktop = ({ event }: any) => (
         </div>
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 const Card = ({ event }: any) => (
-  <div className="relative rounded-2xl p-[0.5px]">
+  <Link href={`/events/${event.slug || event.$id}`} className="block relative rounded-2xl p-[0.5px]">
     <div
       className="absolute inset-0 rounded-2xl"
       style={{
@@ -141,13 +142,13 @@ const Card = ({ event }: any) => (
         </div>
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 /* ---------------- PAST CARD ---------------- */
 
 const Card2 = ({ event }: any) => (
-  <div className="relative rounded-2xl p-[0.5px]">
+  <Link href={`/events/${event.slug || event.$id}`} className="block relative rounded-2xl p-[0.5px]">
     <div
       className="absolute inset-0 rounded-2xl"
       style={{
@@ -171,7 +172,7 @@ const Card2 = ({ event }: any) => (
         {formatDateRange(event.start_date, event.end_date)}
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 /* ---------------- PAGE ---------------- */
