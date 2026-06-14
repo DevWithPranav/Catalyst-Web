@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
@@ -22,6 +23,7 @@ const NowHappening = () => {
   const [featuredEvents, setFeaturedEvents] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFeaturedEvents = async () => {
@@ -78,11 +80,13 @@ const NowHappening = () => {
     );
   }, { scope: container });
 
-  const handleNext = () => {
+  const handleNext = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setCurrentIndex((prev) => (prev + 1) % featuredEvents.length);
   };
 
-  const handlePrev = () => {
+  const handlePrev = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setCurrentIndex((prev) => (prev - 1 + featuredEvents.length) % featuredEvents.length);
   };
 
@@ -103,7 +107,10 @@ const NowHappening = () => {
       {isLoading ? (
         <Skeleton className="nh-card h-[400px] w-full rounded-2xl bg-white/5" />
       ) : featuredEvents.length > 0 ? (
-        <div className="nh-card relative z-10 flex flex-col lg:flex-row w-full bg-[#080808] rounded-2xl md:rounded-[1.25rem] border border-zinc-800 overflow-hidden shadow-2xl">
+        <div 
+          className="nh-card relative z-10 flex flex-col lg:flex-row w-full bg-[#080808] rounded-2xl md:rounded-[1.25rem] border border-zinc-800 overflow-hidden shadow-2xl cursor-pointer hover:border-zinc-600 transition-colors duration-300"
+          onClick={() => router.push(`/events/${currentEvent.slug || currentEvent.$id}`)}
+        >
           
           {/* Left Content */}
           <div className="flex flex-col items-start justify-center p-8 md:p-12 lg:p-16 w-full lg:w-[45%] bg-[#080808]">
@@ -135,7 +142,8 @@ const NowHappening = () => {
             
             <Button 
               className="bg-white text-black hover:bg-zinc-200 px-5 py-6 md:py-6 rounded-md flex items-center gap-1 font-secondary font-medium transition-all text-sm md:text-base group"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (currentEvent.register_link) {
                   window.open(currentEvent.register_link, "_blank");
                 }

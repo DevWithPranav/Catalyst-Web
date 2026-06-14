@@ -57,9 +57,9 @@ export default function EventsPage() {
 
     const fetchEventDetails = async () => {
       try {
-        let res = await fetch(`/api/v1/events/slug/${id}`);
+        let res = await fetch(`/api/v1/events/slug/${encodeURIComponent(id)}`);
         if (res.status === 404) {
-          res = await fetch(`/api/v1/events/${id}`);
+          res = await fetch(`/api/v1/events/${encodeURIComponent(id)}`);
         }
 
         if (res.ok) {
