@@ -7,51 +7,51 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 const achievements = [
   {
     id: "01",
-    title: "1st Place Hackathon",
+    title: "Inauguration",
     description:
-      "Developed a real-time disaster management system using IoT and AWS Rekognition, beating 200+ teams across the nation.",
-    category: "HACKATHON",
-    date: "2025",
+      "Catalyst, the Innovation and Entrepreneurship Centre of MBCET, was inaugurated.",
+    category: "MILESTONE",
+    date: "2009",
     image:
       "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400",
   },
   {
     id: "02",
-    title: "SIH Finalist",
+    title: "MIT Design Workshop",
     description:
-      "Shortlisted for the national finals for an innovative drone-based surveillance system that impressed the jury.",
-    category: "NATIONAL EVENT",
-    date: "2024",
+      "The Media Lab of the Massachusetts Institute of Technology (MIT) conducted a Design Innovation and DIY Workshop.",
+    category: "WORKSHOP",
+    date: "2013",
     image:
       "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1400",
   },
   {
     id: "03",
-    title: "Top 5% Global Coding",
+    title: "MIT-TATA Centre Workshop",
     description:
-      "Ranked in the top 5% among 10,000+ participants in a global competitive programming championship.",
-    category: "COMPETITIVE PROGRAMMING",
-    date: "2024",
+      "Conducted the Massachusetts Institute of Technology (MIT) - TATA Centre Workshop on Innovation, Fabrication, and Entrepreneurship.",
+    category: "WORKSHOP",
+    date: "2014",
     image:
       "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1400",
   },
   {
     id: "04",
-    title: "Best Innovation Award",
+    title: "Kerala Startup Mission Support",
     description:
-      "Awarded for the 'VentureLink' platform at the annual college tech fest for outstanding product vision.",
-    category: "INNOVATION",
-    date: "2023",
+      "IEDC Supported by the Kerala Startup Mission.",
+    category: "PARTNERSHIP",
+    date: "2015",
     image:
       "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1400",
   },
   {
     id: "05",
-    title: "AWS Certified",
+    title: "Incubation Centre",
     description:
-      "Successfully cleared the AWS Solutions Architect certification with a distinction score.",
-    category: "CERTIFICATION",
-    date: "2023",
+      "Established an Incubation Centre in association with KSIDC in January.",
+    category: "MILESTONE",
+    date: "2016",
     image:
       "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1400",
   },

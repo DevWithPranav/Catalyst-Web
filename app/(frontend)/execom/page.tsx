@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import WatermarkHeader from "@/components/home/WatermarkHeader";
 import { useGSAP } from "@gsap/react";
@@ -57,9 +57,9 @@ const Card = ({ invert = false, data = null as any, loading = true }) => {
   return (
     <div className="execom-card">
       <TeamMemberCard
-        name={data?.name ?? "SABAREESH"}
-        role={data?.role ?? "Chief Operations Officer"}
-        image={data?.image ?? "/sab.png"}
+        name={data?.name ?? "Member"}
+        role={data?.roles?.[0]?.name ?? "Execom Member"}
+        image={data?.photo ?? data?.image ?? "/sab.png"}
         invert={invert}
       />
     </div>
@@ -69,13 +69,35 @@ const Card = ({ invert = false, data = null as any, loading = true }) => {
 /* ---------------- EXECOM ---------------- */
 
 const Execom = () => {
-  // Simulate loading state — replace with real API state
-  const isLoading = true;
+  const [members, setMembers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simulated API shape — replace with real fetch
-  const featured = null;
-  const legacyLeaders = [null, null, null, null];
-  const coreTeam = [null, null, null, null, null, null];
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await fetch("/api/v1/members?limit=100");
+        if (res.ok) {
+          const data = await res.json();
+          const docs = data.documents || [];
+          
+          // Filter by org "iedc" or "catalyst"
+          const iedcMembers = docs.filter((m: any) => 
+            m.orgs?.some((o: any) => o.name?.toLowerCase().includes("iedc") || o.name?.toLowerCase().includes("catalyst"))
+          );
+          setMembers(iedcMembers);
+        }
+      } catch (error) {
+        console.error("Failed to fetch members:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMembers();
+  }, []);
+
+  const featured = members.find((m) => m.roles?.some((r: any) => r.name?.toLowerCase().includes("nodal") || r.name?.toLowerCase().includes("lead") || r.name?.toLowerCase().includes("ceo"))) || null;
+  const legacyLeaders = members.filter((m) => m !== featured && m.roles?.some((r: any) => r.name?.toLowerCase().includes("legacy") || r.name?.toLowerCase().includes("alumni")));
+  const coreTeam = members.filter((m) => m !== featured && !legacyLeaders.includes(m));
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -128,14 +150,20 @@ const Execom = () => {
           CORE TEAM
         </h2>
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-6">
-          {coreTeam.map((member, index) => (
-            <Card
-              key={index}
-              loading={isLoading}
-              data={member}
-              invert={false}
-            />
-          ))}
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, idx) => <Card key={idx} loading={true} invert={false} />)
+          ) : coreTeam.length > 0 ? (
+            coreTeam.map((member, index) => (
+              <Card
+                key={index}
+                loading={false}
+                data={member}
+                invert={false}
+              />
+            ))
+          ) : (
+            <p className="col-span-full text-center text-white/50">No core team members found.</p>
+          )}
         </div>
       </div>
 
@@ -145,9 +173,15 @@ const Execom = () => {
           LEGACY LEADERS
         </h2>
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 md:grid-cols-4">
-          {legacyLeaders.map((member, index) => (
-            <Card key={index} loading={isLoading} data={member} invert={true} />
-          ))}
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, idx) => <Card key={idx} loading={true} invert={true} />)
+          ) : legacyLeaders.length > 0 ? (
+            legacyLeaders.map((member, index) => (
+              <Card key={index} loading={false} data={member} invert={true} />
+            ))
+          ) : (
+            <p className="col-span-full text-center text-black/50">No legacy leaders found.</p>
+          )}
         </div>
       </div>
     </div>
