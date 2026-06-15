@@ -13,6 +13,7 @@ const monumentFont = localFont({
 const poppinsFont = localFont({
   src: "../../../public/fonts/Poppins-Regular.ttf",
   display: "swap",
+});
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import { useAdminSettings } from "@/hooks/use-admin-settings";

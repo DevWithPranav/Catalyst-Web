@@ -16,6 +16,12 @@ interface AdminAppearance {
 
 interface AdminPermissions {
   defaultNewMemberRole: string;
+  allowPublicRegistration: boolean;
+  requireEmailVerification: boolean;
+  enableGuestAccess: boolean;
+  allowMemberInvites: boolean;
+  requireEventApproval: boolean;
+  requireAchievementApproval: boolean;
 }
 
 interface AdminUIElements {
@@ -116,6 +122,12 @@ const defaultState = {
   },
   permissions: {
     defaultNewMemberRole: "member",
+    allowPublicRegistration: true,
+    requireEmailVerification: false,
+    enableGuestAccess: true,
+    allowMemberInvites: false,
+    requireEventApproval: true,
+    requireAchievementApproval: true,
   },
   uiElements: {
     showExportButtons: true,

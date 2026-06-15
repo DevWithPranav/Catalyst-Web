@@ -47,12 +47,14 @@ export default function SettingsPage() {
   const { 
     features, 
     appearance, 
+    permissions,
     uiElements,
     frontendPages,
     frontendComponents,
     pageComponents,
     toggleFeature, 
     updateAppearance, 
+    updatePermissions,
     toggleUIElement,
     toggleFrontendPage,
     toggleFrontendComponent,
@@ -844,14 +846,137 @@ export default function SettingsPage() {
                   Configure system-wide permission settings and default access roles.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-center py-10 text-center">
-                  <Shield className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium">Advanced Permissions Upcoming</h3>
-                  <p className="text-muted-foreground text-sm max-w-sm mt-2">
-                    Granular permission controls are being migrated to the new centralized system. Check back in a future update.
-                  </p>
+              <CardContent className="space-y-8">
+                
+                {/* Registration & Access Settings */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4 text-foreground/90 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" /> Registration & Access
+                  </h3>
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <Checkbox 
+                        id="perm-pub" 
+                        checked={permissions.allowPublicRegistration}
+                        onCheckedChange={(c) => updatePermissions({ allowPublicRegistration: c as boolean })}
+                        className="mt-1"
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="perm-pub" className="text-base font-semibold">Allow Public Registration</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Let anyone create an account on the platform without an invite.
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+
+                    <div className="flex items-start space-x-4">
+                      <Checkbox 
+                        id="perm-email" 
+                        checked={permissions.requireEmailVerification}
+                        onCheckedChange={(c) => updatePermissions({ requireEmailVerification: c as boolean })}
+                        className="mt-1"
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="perm-email" className="text-base font-semibold">Require Email Verification</Label>
+                        <p className="text-sm text-muted-foreground">
+                          New users must verify their email address before accessing features.
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+
+                    <div className="flex items-start space-x-4">
+                      <Checkbox 
+                        id="perm-guest" 
+                        checked={permissions.enableGuestAccess}
+                        onCheckedChange={(c) => updatePermissions({ enableGuestAccess: c as boolean })}
+                        className="mt-1"
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="perm-guest" className="text-base font-semibold">Enable Guest Access</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Allow non-registered users to view public achievements and events.
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="perm-role" className="text-base font-semibold">Default New Member Role</Label>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        The role automatically assigned to users upon successful registration.
+                      </p>
+                      <select 
+                        id="perm-role" 
+                        value={permissions.defaultNewMemberRole}
+                        onChange={(e) => updatePermissions({ defaultNewMemberRole: e.target.value })}
+                        className="flex h-10 w-full max-w-sm items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="editor">Editor</option>
+                        <option value="member">Member</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Workflow & Moderation Settings */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4 text-foreground/90 flex items-center gap-2 mt-8">
+                    <Shield className="w-5 h-5 text-primary" /> Workflow & Moderation
+                  </h3>
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <Checkbox 
+                        id="perm-invite" 
+                        checked={permissions.allowMemberInvites}
+                        onCheckedChange={(c) => updatePermissions({ allowMemberInvites: c as boolean })}
+                        className="mt-1"
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="perm-invite" className="text-base font-semibold">Allow Member Invites</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Let existing members send registration invites to external users.
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+
+                    <div className="flex items-start space-x-4">
+                      <Checkbox 
+                        id="perm-req-evt" 
+                        checked={permissions.requireEventApproval}
+                        onCheckedChange={(c) => updatePermissions({ requireEventApproval: c as boolean })}
+                        className="mt-1"
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="perm-req-evt" className="text-base font-semibold">Require Event Approval</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Events created by editors/members require admin approval before going live.
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+
+                    <div className="flex items-start space-x-4">
+                      <Checkbox 
+                        id="perm-req-ach" 
+                        checked={permissions.requireAchievementApproval}
+                        onCheckedChange={(c) => updatePermissions({ requireAchievementApproval: c as boolean })}
+                        className="mt-1"
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="perm-req-ach" className="text-base font-semibold">Require Achievement Approval</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Achievements submitted by members require admin approval.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </CardContent>
             </Card>
           )}
