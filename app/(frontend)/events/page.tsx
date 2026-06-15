@@ -8,6 +8,7 @@ import NowHappening from "@/components/home/NowHappening";
 
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdminSettings } from "@/hooks/use-admin-settings";
 
 /* ---------------- IMAGE UTILS ---------------- */
 
@@ -178,6 +179,7 @@ const Card2 = ({ event }: any) => (
 /* ---------------- PAGE ---------------- */
 
 const Events = () => {
+  const { pageComponents } = useAdminSettings();
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -214,7 +216,7 @@ const Events = () => {
   return (
     <div className="sm:mb-10 mb-5">
       <div className="w-full px-5 sm:px-10 lg:px-20">
-        <NowHappening />
+        {pageComponents.events.showNowHappening && <NowHappening />}
 
         {!isLoading && events.length === 0 && (
           <p className="text-lg tracking-wide text-white/50 font-primary text-center mt-30 mb-5 md:text-3xl md:mb-7 md:mt-25">
@@ -223,7 +225,7 @@ const Events = () => {
         )}
 
         {/* UPCOMING EVENTS SECTION */}
-        {(isLoading || upcomingEvents.length > 0) && (
+        {pageComponents.events.showUpcoming && (isLoading || upcomingEvents.length > 0) && (
           <>
             <p className="text-lg tracking-wide text-white font-primary text-center mt-30 mb-5 md:text-left md:text-3xl md:mb-7 md:mt-25">
               UPCOMING EVENTS
@@ -243,7 +245,7 @@ const Events = () => {
         )}
 
         {/* PAST EXPERIENCES SECTION */}
-        {(isLoading || pastEvents.length > 0) && (
+        {pageComponents.events.showPast && (isLoading || pastEvents.length > 0) && (
           <>
             <p className="text-lg tracking-wide text-white font-primary text-center mt-20 mb-5 md:text-left md:text-3xl md:mb-7 md:mt-20">
               PAST EXPERIENCES

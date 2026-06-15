@@ -7,6 +7,7 @@ import { gsap } from "@/lib/gsap";
 
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdminSettings } from "@/hooks/use-admin-settings";
 
 const Card = ({ year, title, description, image }: any) => {
   return (
@@ -41,6 +42,7 @@ const Card = ({ year, title, description, image }: any) => {
 };
 
 const Team = () => {
+  const { pageComponents } = useAdminSettings();
   const container = useRef<HTMLDivElement>(null);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,50 +127,52 @@ const Team = () => {
         )}
 
         {/* Featured Achievement */}
-        {isLoading ? (
-          <Skeleton className="ach-featured h-[400px] w-full rounded-2xl bg-white/5" />
-        ) : featured ? (
-          <div className="ach-featured relative z-10 flex flex-col lg:flex-row w-full bg-[#080808] rounded-2xl md:rounded-[1.25rem] border border-zinc-800 overflow-hidden shadow-2xl ">
-            
-            {/* Left Content */}
-            <div className="flex flex-col items-start justify-center p-8 md:p-12 lg:p-16 w-full lg:w-[45%] bg-[#080808]">
-              <div className="flex flex-col items-start">
-                <div className="flex items-center gap-[6px] mb-2 tracking-widest">
-                  <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">LATEST</span>
-                  <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">ACHIEVEMENT</span>
+        {pageComponents.achievements.showFeatured && (
+          isLoading ? (
+            <Skeleton className="ach-featured h-[400px] w-full rounded-2xl bg-white/5" />
+          ) : featured ? (
+            <div className="ach-featured relative z-10 flex flex-col lg:flex-row w-full bg-[#080808] rounded-2xl md:rounded-[1.25rem] border border-zinc-800 overflow-hidden shadow-2xl ">
+              
+              {/* Left Content */}
+              <div className="flex flex-col items-start justify-center p-8 md:p-12 lg:p-16 w-full lg:w-[45%] bg-[#080808]">
+                <div className="flex flex-col items-start">
+                  <div className="flex items-center gap-[6px] mb-2 tracking-widest">
+                    <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">LATEST</span>
+                    <span className="font-primary text-[10px] md:text-xs text-white uppercase font-normal">ACHIEVEMENT</span>
+                  </div>
+                  
+                  <div className="w-full h-[1px] bg-zinc-400 mb-4" /> 
+                  
+                  <h3 className="font-primary font-normal text-[2rem] sm:text-3xl md:text-4xl lg:text-[2.5rem] text-white leading-tight tracking-wide mb-2">
+                    {featured.title}
+                  </h3>
+                  
+                  <div className="w-full h-[1px] bg-zinc-400 mt-4 mb-4" /> 
+                  
+                  <p className="font-secondary text-sm sm:text-base text-gray-300 leading-relaxed mb-4">
+                    {featured.description}
+                  </p>
                 </div>
-                
-                <div className="w-full h-[1px] bg-zinc-400 mb-4" /> 
-                
-                <h3 className="font-primary font-normal text-[2rem] sm:text-3xl md:text-4xl lg:text-[2.5rem] text-white leading-tight tracking-wide mb-2">
-                  {featured.title}
-                </h3>
-                
-                <div className="w-full h-[1px] bg-zinc-400 mt-4 mb-4" /> 
-                
-                <p className="font-secondary text-sm sm:text-base text-gray-300 leading-relaxed mb-4">
-                  {featured.description}
-                </p>
+              </div>
+
+              {/* Right Image */}
+              <div className="w-full lg:w-[55%] h-64 sm:h-80 lg:h-auto relative bg-[#080808]">
+                {/* Fading gradient edge for smooth blend on desktop */}
+                <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#080808] via-[#080808]/80 to-transparent z-10" />
+                <Image 
+                  src={featured.cover_image || featured.image || "/agni.png"} 
+                  alt={featured.title} 
+                  fill
+                  unoptimized={(featured.cover_image || featured.image || "").includes('appwrite.io')}
+                  className="object-cover grayscale opacity-75"
+                />
               </div>
             </div>
-
-            {/* Right Image */}
-            <div className="w-full lg:w-[55%] h-64 sm:h-80 lg:h-auto relative bg-[#080808]">
-              {/* Fading gradient edge for smooth blend on desktop */}
-              <div className="hidden lg:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#080808] via-[#080808]/80 to-transparent z-10" />
-              <Image 
-                src={featured.cover_image || featured.image || "/agni.png"} 
-                alt={featured.title} 
-                fill
-                unoptimized={(featured.cover_image || featured.image || "").includes('appwrite.io')}
-                className="object-cover grayscale opacity-75"
-              />
-            </div>
-          </div>
-        ) : null}
+          ) : null
+        )}
 
         {/* Recent Achievements */}
-        {(isLoading || recentAchievements.length > 0) && (
+        {pageComponents.achievements.showRecent && (isLoading || recentAchievements.length > 0) && (
           <>
             <p className="text-lg tracking-wide text-white font-primary text-center mt-20 mb-8 md:text-left md:text-3xl">
               RECENT ACHIEVEMENTS
@@ -189,7 +193,7 @@ const Team = () => {
         )}
 
         {/* Past Achievements */}
-        {(isLoading || pastAchievements.length > 0) && (
+        {pageComponents.achievements.showPast && (isLoading || pastAchievements.length > 0) && (
           <>
             <p className="text-lg tracking-wide text-white font-primary text-center mt-20 mb-8 md:text-left md:text-3xl">
               PAST ACHIEVEMENTS

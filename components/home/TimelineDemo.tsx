@@ -7,53 +7,99 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 const achievements = [
   {
     id: "01",
-    title: "Inauguration",
-    description:
-      "Catalyst, the Innovation and Entrepreneurship Centre of MBCET, was inaugurated.",
-    category: "MILESTONE",
+    category: "INAUGURATION",
     date: "2009",
-    image:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1400",
+    title: "The Beginning of Catalyst MBCET",
+    description: "Catalyst, the Innovation and Entrepreneurship Centre of MBCET, was inaugurated",
+    image: "/timelineimages/1.png",
   },
   {
     id: "02",
-    title: "MIT Design Workshop",
-    description:
-      "The Media Lab of the Massachusetts Institute of Technology (MIT) conducted a Design Innovation and DIY Workshop.",
     category: "WORKSHOP",
     date: "2013",
-    image:
-      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1400",
+    title: "Catalyst x MIT",
+    description: "The Media Lab of the Massachusetts Institute of Technology (MIT) conducted a Design Innovation and DIY Workshop",
+    image: "/timelineimages/2.png",
   },
   {
     id: "03",
-    title: "MIT-TATA Centre Workshop",
-    description:
-      "Conducted the Massachusetts Institute of Technology (MIT) - TATA Centre Workshop on Innovation, Fabrication, and Entrepreneurship.",
     category: "WORKSHOP",
     date: "2014",
-    image:
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1400",
+    title: "Catalyst x TATA Centre",
+    description: "Conducted the Massachusetts Institute of Technology (MIT) - TATA Centre Workshop on Innovation, Fabrication, and Entrepreneurship",
+    image: "/timelineimages/3.png",
   },
   {
     id: "04",
-    title: "Kerala Startup Mission Support",
-    description:
-      "IEDC Supported by the Kerala Startup Mission.",
-    category: "PARTNERSHIP",
+    category: "RECOGNITION",
     date: "2015",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1400",
+    title: "The Beginning of Catalyst IEDC",
+    description: "IEDC Supported by the Kerala Startup Mission",
+    image: "/timelineimages/4.png",
   },
   {
     id: "05",
-    title: "Incubation Centre",
-    description:
-      "Established an Incubation Centre in association with KSIDC in January.",
-    category: "MILESTONE",
+    category: "RECOGNITION",
     date: "2016",
-    image:
-      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1400",
+    title: "Incubation Center",
+    description: "Established an Incubation Centre in association with KSIDC in January",
+    image: "/timelineimages/5.png",
+  },
+  {
+    id: "06",
+    category: "CONCLAVE",
+    date: "2017",
+    title: "Startup and SME Conclave",
+    description: "Kerala’s Biggest Greenroom Startup and SME Conclave",
+    image: "/timelineimages/6.png",
+  },
+  {
+    id: "07",
+    category: "BOOTCAMP",
+    date: "2018",
+    title: "Startup India Yatra Bootcamp",
+    description: "Hosted Startup India Yatra Bootcamp 2018",
+    image: "/timelineimages/7.png",
+  },
+  {
+    id: "08",
+    category: "CONFERENCE",
+    date: "2019",
+    title: "National Children’s Science Congress",
+    description: "The 27th edition of the National Children's Science Congress (NCSC) was held from December 27 to December 31, 2019",
+    image: "/timelineimages/8.png",
+  },
+  {
+    id: "09",
+    category: "EVENT",
+    date: "2020",
+    title: "IDEA Fest 2020",
+    description: "KSUM’s IDEA Fest 2020 was hosted by Catalyst IEDC",
+    image: "/timelineimages/9.png",
+  },
+  {
+    id: "10",
+    category: "ACHIEVEMENT",
+    date: "2021",
+    title: "OxiFine Technology Transfer",
+    description: "OxiFine is a low-cost, IoT-based smart pulse oximeter device developed by Vishnu P. Kumar (Former CTO, Catalyst IEDC).",
+    image: "/timelineimages/10.png",
+  },
+  {
+    id: "11",
+    category: "RECOGNITION",
+    date: "2022",
+    title: "Technology Business Incubator",
+    description: "TBI approval by Kerala Startup Mission",
+    image: "/timelineimages/11.png",
+  },
+  {
+    id: "12",
+    category: "PARTNERSHIP",
+    date: "2025",
+    title: "Permute 2025",
+    description: "Partnered with Permute 2025: India’s Largest Skill Festival",
+    image: "/timelineimages/12.png",
   },
 ];
 
