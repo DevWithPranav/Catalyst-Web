@@ -7,7 +7,7 @@ import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
 import localFont from 'next/font/local';
 import TeamMemberCard from '@/components/TeamMemberCard';
-import { useAdminSettings } from "@/hooks/use-admin-settings";
+
 
 const enigma = localFont({
   src: "../../../public/fonts/enigma.otf",
@@ -70,7 +70,7 @@ const Card = ({ invert = false, data = null as any, loading = true }) => {
 /* ---------------- EXECOM ---------------- */
 
 const Execom = () => {
-  const { pageComponents } = useAdminSettings();
+
   const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -142,14 +142,14 @@ const Execom = () => {
       </div>
 
       {/* ── FEATURED LEAD ── */}
-      {pageComponents.execom.showFeatured && (
+      {(
         <div className="flex justify-center mt-[-40px]">
           <Card loading={isLoading} data={featured} invert={false} />
         </div>
       )}
 
       {/* ── CORE TEAM ── */}
-      {pageComponents.execom.showCore && (
+      {(
         <div className="mt-20 mx-5">
           <h2 className="font-primary text-xl text-white text-center mb-10 sm:text-2xl md:text-3xl">
             CORE TEAM
@@ -174,7 +174,7 @@ const Execom = () => {
       )}
 
       {/* ── LEGACY LEADERS ── */}
-      {pageComponents.execom.showLegacy && (
+      {(
         <div className="bg-white pt-10 mt-20 mx-5 pb-10">
           <h2 className="font-primary text-xl mt-5 text-black text-center mb-10 sm:text-2xl md:text-3xl">
             LEGACY LEADERS

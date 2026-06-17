@@ -7,7 +7,7 @@ import localFont from 'next/font/local';
 import WatermarkHeader from '@/components/home/WatermarkHeader';
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/gsap";
-import { useAdminSettings } from "@/hooks/use-admin-settings";
+
 
 const enigma = localFont({
   src: "../../../public/fonts/enigma.otf",
@@ -24,7 +24,7 @@ const CabnetFont = localFont({
 import TeamMemberCard from '@/components/TeamMemberCard';
 
 const DevTeamPage = () => {
-  const { pageComponents } = useAdminSettings();
+
   const container = useRef<HTMLDivElement>(null);
 
   useGSAP(() => {
@@ -69,7 +69,7 @@ const DevTeamPage = () => {
 
       <div className="w-full px-5 sm:px-10 lg:px-20 relative z-10 flex flex-col items-center mt-12 md:mt-24">
 
-        {pageComponents.devTeam.showMembers && (
+        {(
           <>
             {/* Row 1 (5 items) */}
             <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-12 w-full">
@@ -91,7 +91,7 @@ const DevTeamPage = () => {
         )}
 
         {/* CATALYST WEB V1 Section */}
-        {pageComponents.devTeam.showV1 && (
+        {(
           <div className="v1-section flex flex-col items-center w-full max-w-4xl text-center mb-8">
             <h2 className={`${enigma.className} text-white text-2xl md:text-3xl lg:text-4xl mb-6 tracking-wide`}>
               CATALYST WEB V1

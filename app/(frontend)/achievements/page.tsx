@@ -7,7 +7,7 @@ import { gsap } from "@/lib/gsap";
 
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdminSettings } from "@/hooks/use-admin-settings";
+
 
 const Card = ({ year, title, description, image }: any) => {
   return (
@@ -42,7 +42,7 @@ const Card = ({ year, title, description, image }: any) => {
 };
 
 const Team = () => {
-  const { pageComponents } = useAdminSettings();
+
   const container = useRef<HTMLDivElement>(null);
   const [achievements, setAchievements] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -127,7 +127,7 @@ const Team = () => {
         )}
 
         {/* Featured Achievement */}
-        {pageComponents.achievements.showFeatured && (
+        {(
           isLoading ? (
             <Skeleton className="ach-featured h-[400px] w-full rounded-2xl bg-white/5" />
           ) : featured ? (
@@ -172,7 +172,7 @@ const Team = () => {
         )}
 
         {/* Recent Achievements */}
-        {pageComponents.achievements.showRecent && (isLoading || recentAchievements.length > 0) && (
+        {(isLoading || recentAchievements.length > 0) && (
           <>
             <p className="text-lg tracking-wide text-white font-primary text-center mt-20 mb-8 md:text-left md:text-3xl">
               RECENT ACHIEVEMENTS
@@ -193,7 +193,7 @@ const Team = () => {
         )}
 
         {/* Past Achievements */}
-        {pageComponents.achievements.showPast && (isLoading || pastAchievements.length > 0) && (
+        {(isLoading || pastAchievements.length > 0) && (
           <>
             <p className="text-lg tracking-wide text-white font-primary text-center mt-20 mb-8 md:text-left md:text-3xl">
               PAST ACHIEVEMENTS

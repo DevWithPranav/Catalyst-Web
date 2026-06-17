@@ -15,10 +15,10 @@ const enigma = localFont({
 
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdminSettings } from "@/hooks/use-admin-settings";
+
 
 export default function Page() {
-  const { pageComponents } = useAdminSettings();
+
   const container = useRef<HTMLDivElement>(null);
   const [items, setItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +80,7 @@ export default function Page() {
       </div>
       
       <div className="mx-5 md:mx-10 lg:mx-20 mt-12">
-        {pageComponents.gallery.showMasonry && (
+        {(
           isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
